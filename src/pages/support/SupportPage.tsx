@@ -562,7 +562,7 @@ const SupportPage: React.FC = () => {
             )}
 
             {/* Add Response */}
-            {selectedTicket.status === 'open' || selectedTicket.status === 'in_progress' && (
+            {(selectedTicket.status === 'open' || selectedTicket.status === 'in_progress') && (
               <div>
                 <h4 className="font-semibold text-gray-900 mb-4 uppercase tracking-wide">Add Response</h4>
                 <form onSubmit={handleAddResponse} className="space-y-4">
