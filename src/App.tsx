@@ -13,6 +13,7 @@ import WithdrawalPage from './pages/withdrawals/WithdrawalPage';
 import MessagesPage from './pages/messages/MessagesPage';
 import SupportPage from './pages/support/SupportPage';
 import AccountClosurePage from './pages/account-closure/AccountClosurePage';
+import SystemSettingsPage from './pages/system/SystemSettingsPage';
 
 function App() {
   return (
@@ -81,6 +82,16 @@ function App() {
                   <ProtectedRoute>
                     <InvestorLayout>
                       <AccountClosurePage />
+                    </InvestorLayout>
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/system-settings" 
+                element={
+                  <ProtectedRoute>
+                    <InvestorLayout>
+                      <SystemSettingsPage />
                     </InvestorLayout>
                   </ProtectedRoute>
                 } 

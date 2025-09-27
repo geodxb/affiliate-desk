@@ -20,6 +20,7 @@ export const ROUTES = {
   MESSAGES: '/messages',
   SUPPORT: '/support',
   ACCOUNT_CLOSURE: '/account-closure',
+  SYSTEM_SETTINGS: '/system-settings',
 };
 
 export const WITHDRAWAL_CONFIG = {

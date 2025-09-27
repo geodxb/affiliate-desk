@@ -12,6 +12,7 @@ import {
   X,
   Building2,
   UserX,
+  Settings,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../common/Button';
@@ -57,6 +58,11 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
       name: 'Account Closure',
       href: ROUTES.ACCOUNT_CLOSURE,
       icon: UserX,
+    },
+    {
+      name: 'System Settings',
+      href: ROUTES.SYSTEM_SETTINGS,
+      icon: Settings,
     },
   ];
 
