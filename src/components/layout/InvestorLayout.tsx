@@ -14,7 +14,6 @@ import {
   UserX,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import NotificationBell from '../common/NotificationBell';
 import Button from '../common/Button';
 import { ROUTES } from '../../lib/constants';
 
@@ -118,8 +117,6 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
 
             {/* Right side - Notifications and User */}
             <div className="flex items-center space-x-4">
-              <NotificationBell />
-              
               {/* User info */}
               <div className="hidden lg:flex items-center space-x-2 min-w-0">
                 <span className="text-sm font-medium text-gray-900 truncate max-w-40">
