@@ -49,7 +49,6 @@ const InvestorProfilePage: React.FC = () => {
 
   useEffect(() => {
       loadProfileData();
-    }
   }, [currentUser]);
 
   useEffect(() => {

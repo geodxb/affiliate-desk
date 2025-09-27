@@ -4,12 +4,18 @@ import { motion } from 'framer-motion';
 const LoadingScreen: React.FC = () => {
   return (
     <div className="fixed inset-0 bg-white flex flex-col items-center justify-center z-50">
-      {/* Static Logo */}
+      {/* Spinning Logo */}
       <div className="mb-8">
-        <img 
-          src="/loading.png" 
-          alt="Loading Logo" 
-          className="w-32 h-32 object-contain"
+        <motion.img 
+          src="/interactive-brokers-logo.png" 
+          alt="Interactive Brokers" 
+          className="w-40 h-40 object-contain"
+          animate={{ rotate: 360 }}
+          transition={{
+            duration: 2,
+            repeat: Infinity,
+            ease: "linear"
+          }}
         />
       </div>
 
@@ -27,17 +33,17 @@ const LoadingScreen: React.FC = () => {
           <motion.div
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0 }}
-            className="w-2 h-2 bg-red-700 rounded-full"
+            className="w-2 h-2 bg-blue-600 rounded-full"
           />
           <motion.div
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0.2 }}
-            className="w-2 h-2 bg-red-700 rounded-full"
+            className="w-2 h-2 bg-blue-600 rounded-full"
           />
           <motion.div
             animate={{ scale: [1, 1.2, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0.4 }}
-            className="w-2 h-2 bg-red-700 rounded-full"
+            className="w-2 h-2 bg-blue-600 rounded-full"
           />
         </div>
       </motion.div>
