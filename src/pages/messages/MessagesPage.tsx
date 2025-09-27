@@ -4,6 +4,7 @@ import { Send, Paperclip, MessageCircle, Plus, AlertTriangle } from 'lucide-reac
 import { useAuth } from '../../contexts/AuthContext';
 import { messageService } from '../../services/messageService';
 import { firestoreService } from '../../services/firestoreService';
+import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -353,6 +354,7 @@ const MessagesPage: React.FC = () => {
   }
 
   return (
+    <FunctionalityGuard functionality="messaging">
     <div className="space-y-6 pb-20 lg:pb-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -898,6 +900,7 @@ const MessagesPage: React.FC = () => {
         </div>
       </Modal>
     </div>
+    </FunctionalityGuard>
   );
 };
 

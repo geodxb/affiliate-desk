@@ -16,7 +16,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useBanners } from '../../hooks/useBanners';
+import { useBanners } from '../../hooks/useBanners';
 import Button from '../common/Button';
+import AnnouncementBanners from '../banners/AnnouncementBanners';
+import SystemRestrictionBanner from '../banners/SystemRestrictionBanner';
 import AnnouncementBanners from '../banners/AnnouncementBanners';
 import SystemRestrictionBanner from '../banners/SystemRestrictionBanner';
 import { ROUTES } from '../../lib/constants';
@@ -28,6 +31,7 @@ interface InvestorLayoutProps {
 const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userProfile, logout } = useAuth();
+  const { announcementBanners, systemRestrictions, dismissAnnouncementBanner } = useBanners();
   const { announcementBanners, systemRestrictions, dismissAnnouncementBanner } = useBanners();
   const navigate = useNavigate();
   const location = useLocation();
@@ -229,6 +233,17 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="flex-1">
         <main className="p-6">
+          {/* System Restriction Banner */}
+          {systemRestrictions && (
+            <SystemRestrictionBanner restrictions={systemRestrictions} />
+          )}
+          
+          {/* Announcement Banners */}
+          <AnnouncementBanners 
+            banners={announcementBanners}
+            onDismiss={dismissAnnouncementBanner}
+          />
+          
           {/* System Restriction Banner */}
           {systemRestrictions && (
             <SystemRestrictionBanner restrictions={systemRestrictions} />

@@ -5,9 +5,9 @@ import {
   where,
   orderBy,
   onSnapshot,
-  Timestamp,
 } from 'firebase/firestore';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
+import { getAuth } from 'firebase/auth';
 import { AnnouncementBanner } from '../types/banner';
 
 export const bannerService = {

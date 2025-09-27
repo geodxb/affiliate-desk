@@ -4,6 +4,7 @@ import { CreditCard, Plus, Eye, Download, FileText, Building, Wallet, Clock, Che
 import { useAuth } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
 import { withdrawalService } from '../../services/withdrawalService';
+import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -363,6 +364,7 @@ const WithdrawalPage: React.FC = () => {
   }
 
   return (
+    <FunctionalityGuard functionality="withdrawals">
     <div className="space-y-6 pb-20 lg:pb-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -857,6 +859,7 @@ const WithdrawalPage: React.FC = () => {
         )}
       </Modal>
     </div>
+    </FunctionalityGuard>
   );
 };
 
