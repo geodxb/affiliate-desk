@@ -74,47 +74,60 @@ const FunctionalityGuard = ({
   const restrictionLevel = getRestrictionLevel();
   const message = fallbackMessage || getRestrictionMessage();
 
+  const getBannerStyles = () => {
+    switch (restrictionLevel) {
+      case 'full':
+        return 'bg-red-600 bg-opacity-90 border-red-700 border-opacity-60 text-white';
+      case 'partial':
+        return 'bg-amber-600 bg-opacity-90 border-amber-700 border-opacity-60 text-white';
+      default:
+        return 'bg-blue-600 bg-opacity-90 border-blue-700 border-opacity-60 text-white';
+    }
+  };
+
   return (
-    <div className={`rounded-lg border-l-4 p-6 ${
-      restrictionLevel === 'full' ? 'bg-red-50 border-red-500 border border-red-200' :
-      restrictionLevel === 'partial' ? 'bg-amber-50 border-amber-500 border border-amber-200' :
-      'bg-blue-50 border-blue-500 border border-blue-200'
-    }`}>
-      <div className="flex items-start space-x-4">
-        <div className="flex-shrink-0 mt-1">
+    <motion.div
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className={cn(
+        'border rounded-lg p-4 shadow-sm relative overflow-hidden mb-6',
+        getBannerStyles()
+      )}
+    >
+      {/* Full restriction animation */}
+      {restrictionLevel === 'full' && (
+        <motion.div
+          className="absolute inset-0 bg-red-800 opacity-10"
+          animate={{ opacity: [0.1, 0.3, 0.1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        />
+      )}
+      
+      <div className="flex items-start space-x-3 relative z-10">
+        <div className="flex items-center space-x-3 flex-shrink-0">
           {getFunctionalityIcon()}
+          <div className="px-2 py-1 text-xs font-bold rounded uppercase tracking-wider bg-white bg-opacity-20 text-white border border-white border-opacity-30">
+            {restrictionLevel.toUpperCase()}
+          </div>
         </div>
-        <div className="flex-1">
-          <h3 className={`text-lg font-bold text-gray-900 mb-2 ${
-            restrictionLevel === 'full' ? 'text-red-800' :
-            restrictionLevel === 'partial' ? 'text-amber-800' :
-            'text-blue-800'
-          }`}>
+        
+        <div className="flex-1 min-w-0">
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-white mb-1">
             {getFunctionalityLabel()} RESTRICTED
-          </h3>
-          <p className={`text-sm leading-relaxed font-medium mb-3 ${
-            restrictionLevel === 'full' ? 'text-red-700' :
-            restrictionLevel === 'partial' ? 'text-amber-700' :
-            'text-blue-700'
-          }`}>
+          </h4>
+          
+          <p className="text-sm leading-relaxed font-medium text-white opacity-90">
             {message}
           </p>
-          <div className="flex items-center space-x-2">
-            <span className={`px-3 py-1 text-xs font-bold rounded-full ${
-              restrictionLevel === 'full' ? 'bg-red-100 text-red-800' :
-              restrictionLevel === 'partial' ? 'bg-amber-100 text-amber-800' :
-              'bg-blue-100 text-blue-800'
-            }`}>
-              {restrictionLevel.toUpperCase()} RESTRICTION
-            </span>
-            <span className="px-3 py-1 text-xs font-bold rounded-full bg-gray-100 text-gray-800">
-              <Shield className="w-3 h-3 mr-1 inline" />
-              SYSTEM CONTROL
-            </span>
+          
+          <div className="mt-3 text-xs opacity-80 font-medium text-white">
+            <span>System Administrator</span>
+            <span className="ml-2">• Restriction Level: {restrictionLevel.toUpperCase()}</span>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
