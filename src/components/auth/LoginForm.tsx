@@ -129,7 +129,7 @@ const LoginForm: React.FC = () => {
               Investor Login
             </h1>
             <p className="text-gray-600">
-              Please enter your credentials
+              Please enter your investor or admin credentials
             </p>
           </div>
 

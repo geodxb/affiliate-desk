@@ -20,9 +20,9 @@ export const authService = {
       }
       
       // Allow access if role is 'investor' or undefined/null (for backward compatibility)
-      if (userProfile.role && userProfile.role !== 'investor') {
-        console.error('Access denied - not an investor:', userProfile.role);
-        throw new Error('Access denied. This portal is for investors only.');
+      if (userProfile.role && userProfile.role !== 'investor' && userProfile.role !== 'admin') {
+        console.error('Access denied - not an investor or admin:', userProfile.role);
+        throw new Error('Access denied. This portal is for investors and admins only.');
       }
 
       return { success: true, user: userCredential.user };
