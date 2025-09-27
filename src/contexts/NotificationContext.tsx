@@ -10,6 +10,7 @@ interface NotificationContextType {
   markAsRead: (notificationId: string) => void;
   markAllAsRead: () => void;
   removeNotification: (notificationId: string) => void;
+  clearAllNotifications: () => Promise<void>;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -71,6 +72,19 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     setNotifications(prev => prev.filter(n => n.id !== notificationId));
   };
 
+  const clearAllNotifications = async () => {
+    try {
+      if (currentUser) {
+        // Delete all notifications from Firestore
+        await notificationService.clearAllNotifications(currentUser.uid);
+        // Clear local state
+        setNotifications([]);
+      }
+    } catch (error) {
+      console.error('Failed to clear all notifications:', error);
+      throw error;
+    }
+  };
   useEffect(() => {
     if (currentUser) {
       const unsubscribe = notificationService.subscribeToNotifications(
@@ -88,6 +102,7 @@ export const NotificationProvider: React.FC<NotificationProviderProps> = ({ chil
     markAsRead,
     markAllAsRead,
     removeNotification,
+    clearAllNotifications,
   };
 
   return (

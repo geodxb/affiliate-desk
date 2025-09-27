@@ -4,6 +4,7 @@ import {
   addDoc,
   updateDoc,
   getDocs,
+  deleteDoc,
   query,
   where,
   orderBy,
@@ -27,6 +28,35 @@ export const notificationService = {
     }
   },
 
+  async clearAllNotifications(userId: string): Promise<boolean> {
+    try {
+      console.log('=== CLEARING ALL NOTIFICATIONS FOR USER ===');
+      console.log('User ID:', userId);
+      
+      // Get all notifications for this user
+      const notificationsQuery = query(
+        collection(db, 'notifications'),
+        where('userId', '==', userId)
+      );
+      
+      const snapshot = await getDocs(notificationsQuery);
+      console.log('Found', snapshot.docs.length, 'notifications to delete');
+      
+      // Delete each notification
+      const deletePromises = snapshot.docs.map(async (notificationDoc) => {
+        console.log('Deleting notification:', notificationDoc.id);
+        const notificationDocRef = doc(db, 'notifications', notificationDoc.id);
+        await deleteDoc(notificationDocRef);
+      });
+      
+      await Promise.all(deletePromises);
+      console.log('All notifications deleted successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to clear all notifications:', error);
+      return false;
+    }
+  },
   async getNotifications(userId: string): Promise<PushNotification[]> {
     try {
       const notificationsQuery = query(

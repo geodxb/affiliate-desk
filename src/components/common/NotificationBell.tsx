@@ -1,14 +1,36 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X } from 'lucide-react';
+import { Bell, X, Trash2 } from 'lucide-react';
 import { useNotifications } from '../../contexts/NotificationContext';
 import { formatDate } from '../../lib/utils';
 import { cn } from '../../lib/utils';
 
 const NotificationBell: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const [isClearing, setIsClearing] = useState(false);
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearAllNotifications } = useNotifications();
 
+  const handleClearAll = async () => {
+    if (notifications.length === 0) return;
+    
+    const confirmed = window.confirm(
+      `Are you sure you want to permanently delete all ${notifications.length} notifications? This action cannot be undone.`
+    );
+    
+    if (confirmed) {
+      setIsClearing(true);
+      try {
+        await clearAllNotifications();
+        // Close the dropdown after clearing
+        setIsOpen(false);
+      } catch (error) {
+        console.error('Failed to clear notifications:', error);
+        alert('Failed to clear notifications. Please try again.');
+      } finally {
+        setIsClearing(false);
+      }
+    }
+  };
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'success':
@@ -73,14 +95,26 @@ const NotificationBell: React.FC = () => {
                   <X className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
-              {unreadCount > 0 && (
-                <button
-                  onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium mt-2"
-                >
-                  Mark all as read
-                </button>
-              )}
+              <div className="flex items-center justify-between mt-2">
+                {unreadCount > 0 && (
+                  <button
+                    onClick={markAllAsRead}
+                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    Mark all as read
+                  </button>
+                )}
+                {notifications.length > 0 && (
+                  <button
+                    onClick={handleClearAll}
+                    disabled={isClearing}
+                    className="flex items-center space-x-1 text-sm text-red-600 hover:text-red-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    <span>{isClearing ? 'Clearing...' : 'Clear All'}</span>
+                  </button>
+                )}
+              </div>
             </div>
 
             <div className="max-h-96 overflow-y-auto">
