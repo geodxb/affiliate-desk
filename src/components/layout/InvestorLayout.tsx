@@ -17,7 +17,7 @@ import {
 import { useAuth } from '../../contexts/AuthContext';
 import { useSystemControls } from '../../hooks/useSystemControls';
 import Button from '../common/Button';
-import SystemRestrictionBanner from '../banners/SystemRestrictionBanner';
+import SystemRestrictionBanner from '../common/SystemRestrictionBanner';
 import { ROUTES } from '../../lib/constants';
 
 interface InvestorLayoutProps {
@@ -229,7 +229,6 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
       <div className="flex-1">
         <main className="p-6">
           <SystemRestrictionBanner />
-          
           {children}
         </main>
       </div>
