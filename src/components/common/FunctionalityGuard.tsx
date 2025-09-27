@@ -16,6 +16,7 @@ const FunctionalityGuard = ({
   showFallback = true 
 }: FunctionalityGuardProps) => {
   const { 
+    systemSettings,
     isWithdrawalsEnabled, 
     isMessagingEnabled, 
     isProfileUpdatesEnabled,
@@ -26,11 +27,11 @@ const FunctionalityGuard = ({
   const isEnabled = () => {
     switch (functionality) {
       case 'withdrawals':
-        return isWithdrawalsEnabled();
+        return systemSettings?.systemControls?.withdrawalsEnabled === true;
       case 'messaging':
-        return isMessagingEnabled();
+        return systemSettings?.systemControls?.messagingEnabled === true;
       case 'profileUpdates':
-        return isProfileUpdatesEnabled();
+        return systemSettings?.systemControls?.profileUpdatesEnabled === true;
       default:
         return true;
     }

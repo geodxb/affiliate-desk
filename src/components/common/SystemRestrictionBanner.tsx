@@ -1,18 +1,16 @@
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useSystemControls } from '../../hooks/useSystemControls';
 import { AlertTriangle, Shield, Lock, MessageSquareOff, CreditCard, UserX, Settings, Info, XCircle } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
-interface SystemRestrictionBannerProps {
-  currentPage?: string;
-  className?: string;
-}
-
-const SystemRestrictionBanner = ({ currentPage, className }: SystemRestrictionBannerProps) => {
+const SystemRestrictionBanner: React.FC = () => {
   const { 
-    systemSettings, 
+    systemSettings,
     isWithdrawalsEnabled, 
     isMessagingEnabled, 
     isProfileUpdatesEnabled,
+    isLoginEnabled,
     isLoginEnabled,
     getRestrictionMessage,
     getRestrictionLevel,
@@ -20,8 +18,8 @@ const SystemRestrictionBanner = ({ currentPage, className }: SystemRestrictionBa
     getMaintenanceMessage
   } = useSystemControls();
 
-  // Check if there are any restrictions in place
-  const hasServiceRestrictions = !isWithdrawalsEnabled() || !isMessagingEnabled() || !isProfileUpdatesEnabled();
+  // Check if there are any restrictions in place based on exact boolean values
+  const hasServiceRestrictions = !isWithdrawalsEnabled() || !isMessagingEnabled() || !isProfileUpdatesEnabled() || !isLoginEnabled();
   const hasGeneralRestrictions = systemSettings?.systemControls?.restrictedMode;
   const hasMaintenanceMode = isMaintenanceMode();
   
@@ -81,10 +79,10 @@ const SystemRestrictionBanner = ({ currentPage, className }: SystemRestrictionBa
 
   const getDisabledFunctionalities = () => {
     const disabled = [];
-    if (!isWithdrawalsEnabled()) disabled.push({ icon: <CreditCard className="w-3 h-3" />, text: 'Withdrawals' });
-    if (!isMessagingEnabled()) disabled.push({ icon: <MessageSquareOff className="w-3 h-3" />, text: 'Messaging' });
-    if (!isProfileUpdatesEnabled()) disabled.push({ icon: <UserX className="w-3 h-3" />, text: 'Profile Updates' });
-    if (!isLoginEnabled()) disabled.push({ icon: <Lock className="w-3 h-3" />, text: 'User Login' });
+    if (systemSettings?.systemControls?.withdrawalsEnabled === false) disabled.push('Withdrawals');
+    if (systemSettings?.systemControls?.messagingEnabled === false) disabled.push('Messaging');
+    if (systemSettings?.systemControls?.profileUpdatesEnabled === false) disabled.push('Profile Updates');
+    if (systemSettings?.systemControls?.loginEnabled === false) disabled.push('User Login');
     return disabled;
   };
 
@@ -150,3 +148,4 @@ const SystemRestrictionBanner = ({ currentPage, className }: SystemRestrictionBa
 };
 
 export default SystemRestrictionBanner;
+          {systemSettings?.systemControls?.restrictionLevel === 'full' && systemSettings?.systemControls?.allowedPages && systemSettings.systemControls.allowedPages.length > 0 && (

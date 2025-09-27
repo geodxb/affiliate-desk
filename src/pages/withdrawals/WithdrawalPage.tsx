@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, Plus, Eye, Download, FileText, Building, Wallet, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemControls } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
 import { withdrawalService } from '../../services/withdrawalService';
 import FunctionalityGuard from '../../components/common/FunctionalityGuard';
@@ -19,6 +20,7 @@ import { cn } from '../../lib/utils';
 
 const WithdrawalPage: React.FC = () => {
   const { currentUser, userProfile } = useAuth();
+  const { isWithdrawalsEnabled } = useSystemControls();
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [loading, setLoading] = useState(true);
@@ -364,7 +366,23 @@ const WithdrawalPage: React.FC = () => {
   }
 
   return (
-    <FunctionalityGuard functionality="withdrawals">
+    <>
+      {!isWithdrawalsEnabled() ? (
+        <div className="space-y-6 pb-20 lg:pb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wide mb-2">
+              Withdrawals
+            </h1>
+            <p className="text-gray-600">
+              Request withdrawals to your verified bank accounts or crypto wallets.
+            </p>
+          </motion.div>
+          <FunctionalityGuard functionality="withdrawals" />
+        </div>
+      ) : (
     <div className="space-y-6 pb-20 lg:pb-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -859,7 +877,8 @@ const WithdrawalPage: React.FC = () => {
         )}
       </Modal>
     </div>
-    </FunctionalityGuard>
+      )}
+    </>
   );
 };
 

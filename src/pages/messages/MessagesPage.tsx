@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, Paperclip, MessageCircle, Plus, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { messageService } from '../../services/messageService';
+import { useSystemControls } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
 import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
@@ -15,6 +16,7 @@ import { cn } from '../../lib/utils';
 
 const MessagesPage: React.FC = () => {
   const { currentUser, userProfile } = useAuth();
+  const { isMessagingEnabled } = useSystemControls();
   const [investorData, setInvestorData] = useState<any>(null);
   const [conversations, setConversations] = useState<(Conversation | ConversationMetadata)[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -354,7 +356,23 @@ const MessagesPage: React.FC = () => {
   }
 
   return (
-    <FunctionalityGuard functionality="messaging">
+    <>
+      {!isMessagingEnabled() ? (
+        <div className="space-y-6 pb-20 lg:pb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wide mb-2">
+              Messages
+            </h1>
+            <p className="text-gray-600">
+              Communicate with our support team.
+            </p>
+          </motion.div>
+          <FunctionalityGuard functionality="messaging" />
+        </div>
+      ) : (
     <div className="space-y-6 pb-20 lg:pb-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -900,7 +918,8 @@ const MessagesPage: React.FC = () => {
         </div>
       </Modal>
     </div>
-    </FunctionalityGuard>
+      )}
+    </>
   );
 };
 

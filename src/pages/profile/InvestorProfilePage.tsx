@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, CreditCard, Wallet, Plus, CreditCard as Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemControls } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
 import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
@@ -13,6 +14,7 @@ import { SUPPORTED_COUNTRIES, CRYPTO_NETWORKS } from '../../lib/constants';
 
 const InvestorProfilePage: React.FC = () => {
   const { currentUser, userProfile, refreshUserProfile } = useAuth();
+  const { isProfileUpdatesEnabled } = useSystemControls();
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [loading, setLoading] = useState(true);
   const [showBankModal, setShowBankModal] = useState(false);
@@ -137,7 +139,10 @@ const InvestorProfilePage: React.FC = () => {
   }, [currentUser]);
   const handlePersonalInfoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!currentUser || !isProfileUpdatesEnabled()) {
+      alert('Profile updates are currently disabled by system administrator.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -169,7 +174,10 @@ const InvestorProfilePage: React.FC = () => {
 
   const handleBankSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser) return;
+    if (!currentUser || !isProfileUpdatesEnabled()) {
+      alert('Profile updates are currently disabled by system administrator.');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -202,7 +210,12 @@ const InvestorProfilePage: React.FC = () => {
 
   const handleCryptoSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentUser || userProfile?.accountType !== 'Pro') return;
+    if (!currentUser || userProfile?.accountType !== 'Pro' || !isProfileUpdatesEnabled()) {
+      if (!isProfileUpdatesEnabled()) {
+        alert('Profile updates are currently disabled by system administrator.');
+      }
+      return;
+    }
 
     setLoading(true);
     try {
@@ -234,7 +247,12 @@ const InvestorProfilePage: React.FC = () => {
   };
 
   const handleDeleteBank = async (accountId: string) => {
-    if (!currentUser || !confirm('Are you sure you want to delete this bank account?')) return;
+    if (!currentUser || !isProfileUpdatesEnabled()) {
+      alert('Profile updates are currently disabled by system administrator.');
+      return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this bank account?')) return;
 
     setLoading(true);
     try {
@@ -255,7 +273,12 @@ const InvestorProfilePage: React.FC = () => {
   };
 
   const handleDeleteCrypto = async (walletId: string) => {
-    if (!currentUser || !confirm('Are you sure you want to delete this crypto wallet?')) return;
+    if (!currentUser || !isProfileUpdatesEnabled()) {
+      alert('Profile updates are currently disabled by system administrator.');
+      return;
+    }
+    
+    if (!confirm('Are you sure you want to delete this crypto wallet?')) return;
 
     setLoading(true);
     try {
@@ -467,13 +490,12 @@ const InvestorProfilePage: React.FC = () => {
           </div>
           
           <Button type="submit" className="mt-6">
-            {loading ? 'Updating...' : 'Update Personal Information'}
+            {loading ? 'Updating...' : isProfileUpdatesEnabled() ? 'Update Personal Information' : 'Profile Updates Disabled'}
           </Button>
         </form>
       </Card>
 
       {/* Bank Accounts */}
-      <FunctionalityGuard functionality="profileUpdates">
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -482,10 +504,16 @@ const InvestorProfilePage: React.FC = () => {
               Bank Accounts
             </h2>
           </div>
-          <Button onClick={() => setShowBankModal(true)} variant="outline">
-            <Plus className="w-4 h-4 mr-2" />
-            Add Bank Account
-          </Button>
+          {isProfileUpdatesEnabled() ? (
+            <Button onClick={() => setShowBankModal(true)} variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
+              Add Bank Account
+            </Button>
+          ) : (
+            <div className="text-sm text-gray-500 font-medium">
+              Profile updates disabled
+            </div>
+          )}
         </div>
 
         {investorData?.bankAccounts.length === 0 ? (
@@ -528,20 +556,28 @@ const InvestorProfilePage: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex space-x-2">
-                    <Button
-                      onClick={() => openEditBank(account)}
-                      variant="outline"
-                      size="sm"
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={() => handleDeleteBank(account.id)}
-                      variant="danger"
-                      size="sm"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    {isProfileUpdatesEnabled() ? (
+                      <>
+                        <Button
+                          onClick={() => openEditBank(account)}
+                          variant="outline"
+                          size="sm"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          onClick={() => handleDeleteBank(account.id)}
+                          variant="danger"
+                          size="sm"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="text-xs text-gray-500">
+                        Editing disabled
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -549,11 +585,9 @@ const InvestorProfilePage: React.FC = () => {
           </div>
         )}
       </Card>
-      </FunctionalityGuard>
 
       {/* Crypto Wallets */}
       {userProfile?.accountType === 'Pro' && (
-        <FunctionalityGuard functionality="profileUpdates">
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -562,10 +596,16 @@ const InvestorProfilePage: React.FC = () => {
                 Crypto Wallets
               </h2>
             </div>
-            <Button onClick={() => setShowCryptoModal(true)} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Add Crypto Wallet
-            </Button>
+            {isProfileUpdatesEnabled() ? (
+              <Button onClick={() => setShowCryptoModal(true)} variant="outline">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Crypto Wallet
+              </Button>
+            ) : (
+              <div className="text-sm text-gray-500 font-medium">
+                Profile updates disabled
+              </div>
+            )}
           </div>
 
           {investorData?.cryptoWallets.length === 0 ? (
@@ -601,22 +641,30 @@ const InvestorProfilePage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex space-x-2">
-                      {wallet.address && wallet.address !== 'No address' && (
-                        <Button
-                          onClick={() => openEditCrypto(wallet)}
-                          variant="outline"
-                          size="sm"
-                        >
-                          <Edit2 className="w-4 h-4" />
-                        </Button>
+                      {isProfileUpdatesEnabled() ? (
+                        <>
+                          {wallet.address && wallet.address !== 'No address' && (
+                            <Button
+                              onClick={() => openEditCrypto(wallet)}
+                              variant="outline"
+                              size="sm"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </Button>
+                          )}
+                          <Button
+                            onClick={() => handleDeleteCrypto(wallet.id)}
+                            variant="danger"
+                            size="sm"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </>
+                      ) : (
+                        <div className="text-xs text-gray-500">
+                          Editing disabled
+                        </div>
                       )}
-                      <Button
-                        onClick={() => handleDeleteCrypto(wallet.id)}
-                        variant="danger"
-                        size="sm"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
                   </div>
                 </div>
@@ -624,7 +672,6 @@ const InvestorProfilePage: React.FC = () => {
             </div>
           )}
         </Card>
-        </FunctionalityGuard>
       )}
 
       {/* Bank Account Modal */}

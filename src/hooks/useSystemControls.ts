@@ -26,19 +26,23 @@ export const useSystemControls = () => {
 
   // Helper functions to check specific restrictions
   const isWithdrawalsEnabled = () => {
-    return systemSettings?.systemControls?.withdrawalsEnabled !== false;
+    return systemSettings?.systemControls?.withdrawalsEnabled === true;
   };
 
   const isMessagingEnabled = () => {
-    return systemSettings?.systemControls?.messagingEnabled !== false;
+    return systemSettings?.systemControls?.messagingEnabled === true;
   };
 
   const isProfileUpdatesEnabled = () => {
-    return systemSettings?.systemControls?.profileUpdatesEnabled !== false;
+    return systemSettings?.systemControls?.profileUpdatesEnabled === true;
   };
 
   const isLoginEnabled = () => {
-    return systemSettings?.systemControls?.loginEnabled !== false;
+    return systemSettings?.systemControls?.loginEnabled === true;
+  };
+
+  const isWithdrawalsDisabled = () => {
+    return systemSettings?.systemControls?.withdrawalsEnabled === false;
   };
 
   const isPageAllowed = (pagePath: string) => {
