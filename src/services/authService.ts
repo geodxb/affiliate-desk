@@ -19,10 +19,10 @@ export const authService = {
         throw new Error('User profile not found. Please contact support.');
       }
       
-      // Allow access if role is 'investor' or undefined/null (for backward compatibility)
-      if (userProfile.role && userProfile.role !== 'investor' && userProfile.role !== 'admin') {
-        console.error('Access denied - not an investor or admin:', userProfile.role);
-        throw new Error('Access denied. This portal is for investors and admins only.');
+      // Allow access for investors, admins, and governors
+      if (userProfile.role && !['investor', 'admin', 'governor'].includes(userProfile.role)) {
+        console.error('Access denied - invalid role:', userProfile.role);
+        throw new Error('Access denied. This portal is for authorized users only.');
       }
 
       return { success: true, user: userCredential.user };
