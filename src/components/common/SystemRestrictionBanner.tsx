@@ -11,7 +11,6 @@ const SystemRestrictionBanner: React.FC = () => {
     isMessagingEnabled, 
     isProfileUpdatesEnabled,
     isLoginEnabled,
-    isLoginEnabled,
     getRestrictionMessage,
     getRestrictionLevel,
     isMaintenanceMode,
