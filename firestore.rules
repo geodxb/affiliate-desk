@@ -97,6 +97,9 @@ service cloud.firestore {
       // Any authenticated user can read admin and governor profiles (for messaging system)
       allow read: if request.auth != null && resource.data.role in ['admin', 'governor'];
       
+      // Allow list queries for authenticated users (needed for fetching admin/governor users)
+      allow list: if isAuthenticated();
+      
       // Governor: Full access to all user profiles (read, write, create, delete)
       allow write: if isGovernor(); // This covers create, update, delete
       allow read: if isGovernor();

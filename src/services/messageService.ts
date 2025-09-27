@@ -734,77 +734,8 @@ export const messageService = {
     console.log('=== SUBSCRIBING TO CONVERSATIONS ===');
     console.log('User ID:', userId);
     
-    // First, let's try to fetch ALL conversations to see what's in the database
-    try {
-      console.log('=== DEBUGGING: FETCHING ALL CONVERSATIONS ===');
-      const conversationsQuery = query(
-        collection(db, 'conversations')
-      );
-
-      return onSnapshot(conversationsQuery, (snapshot) => {
-        console.log('=== ALL CONVERSATIONS DEBUG ===');
-        console.log('Total conversations in database:', snapshot.docs.length);
-        
-        snapshot.docs.forEach((doc, index) => {
-          const data = doc.data();
-          console.log(`Conversation ${index + 1}:`, {
-            id: doc.id,
-            participants: data.participants,
-            participantUids: data.participantUids,
-            participantNames: data.participantNames,
-            title: data.title,
-            hasUserId: {
-              inParticipants: data.participants?.includes(userId),
-              inParticipantUids: data.participantUids?.includes(userId)
-            }
-          });
-        });
-        
-        // STRICT FILTER: Only show conversations created BY the investor
-        const userConversations = snapshot.docs.filter(doc => {
-          const data = doc.data();
-          const isCreatedByInvestor = data.createdBy === userId;
-          console.log(`Filtering conversation ${doc.id}:`, {
-            createdBy: data.createdBy,
-            currentUserId: userId,
-            isCreatedByInvestor,
-            title: data.title
-          });
-          return isCreatedByInvestor;
-        });
-        
-        console.log('Conversations CREATED BY investor:', userConversations.length);
-        
-        const conversations = userConversations.map(doc => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            createdAt: data.createdAt?.toDate() || new Date(),
-            updatedAt: data.updatedAt?.toDate() || new Date(),
-            lastMessage: typeof data.lastMessage === 'string' 
-              ? data.lastMessage 
-              : data.lastMessage && typeof data.lastMessage === 'object' && data.lastMessage.content
-              ? {
-                  ...data.lastMessage,
-                  createdAt: data.lastMessage.createdAt?.toDate() || new Date(),
-                }
-              : undefined,
-          };
-        }) as Conversation[];
-        
-        console.log('Filtered conversations processed:', conversations);
-        callback(conversations);
-      }, (error) => {
-        console.error('Legacy conversations subscription error:', error);
-        console.log('Trying enhanced query as fallback');
-        // Try enhanced query as fallback
-        return this.subscribeToConversationsEnhanced(userId, callback);
-      });
-    } catch (error) {
-      console.error('Error setting up legacy conversations subscription:', error);
-      return this.subscribeToConversationsEnhanced(userId, callback);
-    }
+    // Try enhanced query with createdBy filter
+    return this.subscribeToConversationsEnhanced(userId, callback);
   },
 
   subscribeToConversationsEnhanced(userId: string, callback: (conversations: Conversation[]) => void): () => void {
