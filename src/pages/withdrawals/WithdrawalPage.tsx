@@ -37,7 +37,8 @@ const WithdrawalPage: React.FC = () => {
   useEffect(() => {
     if (currentUser) {
       loadData();
-      subscribeToWithdrawals();
+      const unsubscribe = subscribeToWithdrawals();
+      return unsubscribe;
     }
   }, [currentUser]);
 
@@ -60,10 +61,13 @@ const WithdrawalPage: React.FC = () => {
     if (!currentUser) return;
 
     const unsubscribe = withdrawalService.subscribeToWithdrawals(
+      currentUser.uid,
       (withdrawalRequests) => {
         setWithdrawals(withdrawalRequests);
       }
     );
+
+    return unsubscribe;
   };
 
   const handleSubmitWithdrawal = async (e: React.FormEvent) => {
