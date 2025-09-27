@@ -45,23 +45,23 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({
       case 'full':
         return {
           level: 'full',
-          message: restrictions.restrictionReason || 'System is under full restriction. Most features are disabled.',
+          message: restrictions.restrictionReason || 'System access is currently restricted. Most platform features are temporarily unavailable.',
           icon: XCircle,
-          colors: 'bg-red-600 border-red-700 text-white'
+          colors: 'bg-red-700 border-red-800 text-white'
         };
       case 'partial':
         return {
           level: 'partial',
-          message: restrictions.restrictionReason || 'System is under partial restriction. Some features may be limited.',
+          message: restrictions.restrictionReason || 'Platform access is partially restricted. Some features may be temporarily unavailable.',
           icon: AlertTriangle,
-          colors: 'bg-yellow-50 border-yellow-200 text-yellow-800'
+          colors: 'bg-amber-50 border-amber-300 text-amber-900'
         };
       default:
         return {
           level: 'none',
-          message: restrictions.restrictionReason || 'System restrictions are in effect.',
+          message: restrictions.restrictionReason || 'Platform restrictions are currently in effect.',
           icon: AlertCircle,
-          colors: 'bg-blue-50 border-blue-200 text-blue-800'
+          colors: 'bg-slate-50 border-slate-300 text-slate-800'
         };
     }
   };
@@ -94,44 +94,40 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({
       {/* Full restriction animation */}
       {isFullRestriction && (
         <motion.div
-          className="absolute inset-0 bg-red-700 opacity-10"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 2, repeat: Infinity }}
+          className="absolute inset-0 bg-red-800 opacity-5"
+          animate={{ opacity: [0.05, 0.15, 0.05] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
       )}
       
       <div className="flex items-start space-x-3 relative z-10">
-        <div className="flex items-center space-x-2 flex-shrink-0">
+        <div className="flex items-center space-x-3 flex-shrink-0">
           <Icon className={cn(
             'w-5 h-5 mt-0.5',
             isFullRestriction ? 'text-white' : ''
           )} />
-          <Shield className={cn(
-            'w-4 h-4',
-            isFullRestriction ? 'text-white' : ''
-          )} />
+          <div className={cn(
+            'px-2 py-1 text-xs font-bold rounded uppercase tracking-wider',
+            isFullRestriction 
+              ? 'bg-white bg-opacity-20 text-white border border-white border-opacity-30' 
+              : 'bg-black bg-opacity-10 text-current border border-current border-opacity-20'
+          )}>
+            {restrictionInfo.level.toUpperCase()}
+          </div>
         </div>
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center space-x-2 mb-1">
             <h4 className={cn(
-              'text-sm font-bold uppercase tracking-wide',
+              'text-sm font-semibold uppercase tracking-wider',
               isFullRestriction ? 'text-white' : ''
             )}>
-              System Restriction Active
+              Platform Access Restriction
             </h4>
-            <span className={cn(
-              'text-xs px-2 py-0.5 rounded-full font-medium uppercase',
-              isFullRestriction 
-                ? 'bg-white bg-opacity-20 text-white' 
-                : 'bg-black bg-opacity-10'
-            )}>
-              {restrictionInfo.level}
-            </span>
           </div>
           
           <p className={cn(
-            'text-sm leading-relaxed mb-2',
+            'text-sm leading-relaxed mb-2 font-medium',
             isFullRestriction ? 'text-white' : ''
           )}>
             {restrictionInfo.message}
@@ -140,10 +136,10 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({
           {/* Show disabled services */}
           {disabledServices.length > 0 && (
             <div className={cn(
-              'text-xs',
-              isFullRestriction ? 'text-white opacity-90' : 'opacity-75'
+              'text-xs font-medium',
+              isFullRestriction ? 'text-white opacity-90' : 'opacity-80'
             )}>
-              <span className="font-medium">Affected Services: </span>
+              <span className="font-semibold">Affected Services: </span>
               <span>{disabledServices.join(', ')}</span>
             </div>
           )}
@@ -151,10 +147,10 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({
           {/* Show allowed pages for full restriction */}
           {restrictions.restrictionLevel === 'full' && restrictions.allowedPages.length > 0 && (
             <div className={cn(
-              'mt-2 text-xs',
-              isFullRestriction ? 'text-white opacity-90' : 'opacity-75'
+              'mt-2 text-xs font-medium',
+              isFullRestriction ? 'text-white opacity-90' : 'opacity-80'
             )}>
-              <span className="font-medium">Accessible Pages: </span>
+              <span className="font-semibold">Available Sections: </span>
               <span>{restrictions.allowedPages.join(', ')}</span>
             </div>
           )}

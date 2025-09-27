@@ -59,14 +59,14 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
   const getPriorityIndicator = (priority: string) => {
     switch (priority) {
       case 'urgent':
-        return '🚨';
+        return 'URGENT';
       case 'high':
-        return '⚠️';
+        return 'HIGH';
       case 'medium':
-        return '📢';
+        return 'MEDIUM';
       case 'low':
       default:
-        return 'ℹ️';
+        return 'LOW';
     }
   };
 
@@ -103,34 +103,33 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
               )}
               
               <div className="flex items-start space-x-3 relative z-10">
-                <div className="flex items-center space-x-2 flex-shrink-0">
+                <div className="flex items-center space-x-3 flex-shrink-0">
                   <Icon className={cn(
                     'w-5 h-5 mt-0.5',
                     isUrgent ? 'text-white' : ''
                   )} />
-                  <span className="text-lg">{getPriorityIndicator(banner.priority)}</span>
+                  <div className={cn(
+                    'px-2 py-1 text-xs font-bold rounded uppercase tracking-wider',
+                    isUrgent 
+                      ? 'bg-white bg-opacity-20 text-white border border-white border-opacity-30' 
+                      : 'bg-black bg-opacity-10 text-current border border-current border-opacity-20'
+                  )}>
+                    {getPriorityIndicator(banner.priority)}
+                  </div>
                 </div>
                 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center space-x-2 mb-1">
                     <h4 className={cn(
-                      'text-sm font-bold uppercase tracking-wide',
+                      'text-sm font-semibold uppercase tracking-wider',
                       isUrgent ? 'text-white' : ''
                     )}>
                       {banner.title}
                     </h4>
-                    <span className={cn(
-                      'text-xs px-2 py-0.5 rounded-full font-medium uppercase',
-                      isUrgent 
-                        ? 'bg-white bg-opacity-20 text-white' 
-                        : 'bg-black bg-opacity-10'
-                    )}>
-                      {banner.priority}
-                    </span>
                   </div>
                   
                   <p className={cn(
-                    'text-sm leading-relaxed',
+                    'text-sm leading-relaxed font-medium',
                     isUrgent ? 'text-white' : ''
                   )}>
                     {banner.message}
@@ -138,13 +137,13 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
                   
                   {/* Banner metadata */}
                   <div className={cn(
-                    'mt-2 text-xs opacity-75',
+                    'mt-3 text-xs opacity-80 font-medium',
                     isUrgent ? 'text-white' : ''
                   )}>
-                    <span>Created by {banner.createdByName}</span>
+                    <span>System Administrator</span>
                     {banner.endDate && (
                       <span className="ml-2">
-                        • Expires: {banner.endDate.toLocaleDateString()}
+                        • Valid until: {banner.endDate.toLocaleDateString()}
                       </span>
                     )}
                   </div>
