@@ -1,0 +1,8 @@
+# SPA fallback
+/*    /index.html   200
+
+# Security redirects
+/admin/*  /  301
+/wp-admin/*  /  301
+/.env  /  301
+/.git/*  /  301
