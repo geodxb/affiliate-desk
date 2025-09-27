@@ -62,11 +62,6 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
       href: ROUTES.ACCOUNT_CLOSURE,
       icon: UserX,
     },
-    {
-      name: 'System Settings',
-      href: ROUTES.SYSTEM_SETTINGS,
-      icon: Settings,
-    },
   ];
 
   const handleLogout = async () => {
