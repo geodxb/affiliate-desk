@@ -1,6 +1,8 @@
 import { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 import { useSystemControls } from '../../hooks/useSystemControls';
 import { AlertTriangle, Lock, Shield, MessageSquareOff, CreditCard, UserX } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 interface FunctionalityGuardProps {
   children: ReactNode;
