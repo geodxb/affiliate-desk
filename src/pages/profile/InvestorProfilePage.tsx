@@ -530,17 +530,18 @@ const InvestorProfilePage: React.FC = () => {
           <div className="space-y-4">
             {investorData?.bankAccounts?.map((account) => (
               <div key={account.id} className="p-4 border border-gray-200 rounded-lg">
-                <div className="mb-2 text-xs text-gray-500">Account ID: {account.id}</div>
                 <div className="flex items-center justify-between">
                   <div>
                     <h3 className="font-semibold text-gray-900">
                       {account.accountName || 'Bank Account'}
                     </h3>
-                    <p className="text-sm text-gray-600 font-mono">
-                      {wallet.address ? `${wallet.address.slice(0, 6)}****${wallet.address.slice(-4)}` : 'No address'}
-                    </p>
                     <p className="text-sm text-gray-600">
                       {account.bankName || 'Unknown Bank'} - {account.country || 'Mexico'}
+                    </p>
+                    <p className="text-sm text-gray-600 font-mono">
+                      Account: {account.accountNumber ? 
+                        `**** **** ****` : 
+                        '****'}
                     </p>
                     {account.iban && (
                       <p className="text-xs text-gray-500">IBAN: {account.iban.slice(0, 4)}****{account.iban.slice(-4)}</p>
@@ -621,17 +622,16 @@ const InvestorProfilePage: React.FC = () => {
             <div className="space-y-4">
               {investorData?.cryptoWallets?.map((wallet) => (
                 <div key={wallet.id} className="p-4 border border-gray-200 rounded-lg">
-                  <div className="mb-2 text-xs text-gray-500">Wallet ID: {wallet.id}</div>
                   <div className="flex items-center justify-between">
                     <div>
                       <h3 className="font-semibold text-gray-900">
                         {wallet.label || `${wallet.coinType || 'Unknown'} Wallet`}
                       </h3>
-                      <p className="text-sm text-gray-600 font-mono">
-                        {wallet.address ? `${wallet.address.slice(0, 10)}...${wallet.address.slice(-10)}` : 'No address'}
-                      </p>
                       <p className="text-sm text-gray-600">
                         {wallet.coinType || 'Unknown Coin'} - {wallet.network || 'Unknown Network'}
+                      </p>
+                      <p className="text-sm text-gray-600 font-mono">
+                        {wallet.address ? `${wallet.address.slice(0, 6)}****${wallet.address.slice(-4)}` : '****'}
                       </p>
                       <div className="flex items-center space-x-2 mt-2">
                         <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${getStatusColor(wallet.status)}`}>
@@ -647,7 +647,7 @@ const InvestorProfilePage: React.FC = () => {
                     <div className="flex space-x-2">
                       {isProfileUpdatesEnabled() ? (
                         <>
-                          {wallet.address && wallet.address !== 'No address' && (
+                          {wallet.address && wallet.address !== '****' && (
                             <Button
                               onClick={() => openEditCrypto(wallet)}
                               variant="outline"
