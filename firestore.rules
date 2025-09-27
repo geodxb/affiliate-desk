@@ -403,6 +403,7 @@ service cloud.firestore {
     // Platform Announcements - Admin/Governor create, all can read
     match /announcements/{announcementId} {
       allow read: if isAuthenticated();
+      allow list: if isAuthenticated();
       allow write: if isGovernor() || isAdmin();
     }
     
