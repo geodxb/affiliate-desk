@@ -62,6 +62,11 @@ const WithdrawalPage: React.FC = () => {
       (withdrawalRequests) => {
         setWithdrawals(withdrawalRequests);
       }
+    );
+
+    return unsubscribe;
+  };
+
   const handleSubmitWithdrawal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !investorData) return;
