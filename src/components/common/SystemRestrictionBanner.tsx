@@ -148,4 +148,3 @@ const SystemRestrictionBanner: React.FC = () => {
 };
 
 export default SystemRestrictionBanner;
-          {systemSettings?.systemControls?.restrictionLevel === 'full' && systemSettings?.systemControls?.allowedPages && systemSettings.systemControls.allowedPages.length > 0 && (
