@@ -21,6 +21,7 @@ const WithdrawalPage: React.FC = () => {
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showLoadingScreen, setShowLoadingScreen] = useState(true);
   const [showNewWithdrawal, setShowNewWithdrawal] = useState(false);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<WithdrawalRequest | null>(null);
@@ -63,8 +64,6 @@ const WithdrawalPage: React.FC = () => {
         setWithdrawals(withdrawalRequests);
       }
     );
-
-    return unsubscribe;
   };
 
   const handleSubmitWithdrawal = async (e: React.FormEvent) => {
