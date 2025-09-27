@@ -2,28 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
-import { announcementService } from '../../services/announcementService';
 import OverviewCard from '../../components/dashboard/OverviewCard';
 import PerformanceChart from '../../components/dashboard/PerformanceChart';
 import RecentActivity from '../../components/dashboard/RecentActivity';
-import AnnouncementBanner from '../../components/announcements/AnnouncementBanner';
 import LoadingScreen from '../../components/common/LoadingScreen';
 import { Investor, PerformanceData } from '../../types/user';
 import { Transaction } from '../../types/transaction';
-import { Announcement } from '../../types/common';
 
 const InvestorDashboardPage: React.FC = () => {
   const { currentUser, userProfile } = useAuth();
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (currentUser && userProfile) {
       loadDashboardData();
-      subscribeToAnnouncements();
     }
   }, [currentUser, userProfile]);
 
@@ -72,14 +67,6 @@ const InvestorDashboardPage: React.FC = () => {
     };
   };
 
-  const subscribeToAnnouncements = () => {
-    try {
-      const unsubscribe = announcementService.subscribeToAnnouncements(setAnnouncements);
-      return unsubscribe;
-    } catch (error) {
-      console.error('Failed to subscribe to announcements:', error);
-    }
-  };
 
   // Generate mock performance data for demo
   const generatePerformanceData = (): PerformanceData[] => {
@@ -160,8 +147,6 @@ const InvestorDashboardPage: React.FC = () => {
         </p>
       </motion.div>
 
-      {/* Announcements */}
-      <AnnouncementBanner announcements={announcements} />
 
       {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
