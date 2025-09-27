@@ -1,4 +1,4 @@
-name = "interactive-brokers-portal"
+name = "affiliate-desk2"
 compatibility_date = "2025-01-08"
 main = "src/index.ts"
 
