@@ -40,19 +40,19 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
 
   const getBannerColors = (type: string, priority: string) => {
     if (priority === 'urgent') {
-      return 'bg-red-600 border-red-700 text-white';
+      return 'bg-red-600 bg-opacity-90 border-red-700 border-opacity-60 text-white';
     }
     
     switch (type) {
       case 'critical':
-        return 'bg-red-50 border-red-200 text-red-800';
+        return 'bg-red-50 bg-opacity-70 border-red-200 border-opacity-50 text-red-700';
       case 'warning':
-        return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+        return 'bg-amber-50 bg-opacity-60 border-amber-200 border-opacity-40 text-amber-700';
       case 'maintenance':
-        return 'bg-purple-50 border-purple-200 text-purple-800';
+        return 'bg-purple-50 bg-opacity-60 border-purple-200 border-opacity-40 text-purple-700';
       case 'info':
       default:
-        return 'bg-blue-50 border-blue-200 text-blue-800';
+        return 'bg-blue-50 bg-opacity-60 border-blue-200 border-opacity-40 text-blue-700';
     }
   };
 

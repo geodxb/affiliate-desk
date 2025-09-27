@@ -47,21 +47,21 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({
           level: 'full',
           message: restrictions.restrictionReason || 'System access is currently restricted. Most platform features are temporarily unavailable.',
           icon: XCircle,
-          colors: 'bg-red-700 border-red-800 text-white'
+          colors: 'bg-red-600 bg-opacity-85 border-red-700 border-opacity-50 text-white'
         };
       case 'partial':
         return {
           level: 'partial',
           message: restrictions.restrictionReason || 'Platform access is partially restricted. Some features may be temporarily unavailable.',
           icon: AlertTriangle,
-          colors: 'bg-amber-50 border-amber-300 text-amber-900'
+          colors: 'bg-amber-50 bg-opacity-60 border-amber-200 border-opacity-40 text-amber-800'
         };
       default:
         return {
           level: 'none',
           message: restrictions.restrictionReason || 'Platform restrictions are currently in effect.',
           icon: AlertCircle,
-          colors: 'bg-slate-50 border-slate-300 text-slate-800'
+          colors: 'bg-slate-50 bg-opacity-60 border-slate-200 border-opacity-40 text-slate-700'
         };
     }
   };
