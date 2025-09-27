@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { useSystemControls } from '../../hooks/useSystemControls';
 import { AlertTriangle, Lock, Shield, MessageSquareOff, CreditCard, UserX } from 'lucide-react';
@@ -42,13 +42,13 @@ const FunctionalityGuard = ({
   const getFunctionalityLabel = () => {
     switch (functionality) {
       case 'withdrawals':
-        return 'WITHDRAWAL FUNCTIONALITY';
+        return 'WITHDRAWAL FUNCTIONALITY RESTRICTED';
       case 'messaging':
-        return 'MESSAGING SYSTEM';
+        return 'MESSAGING FUNCTIONALITY RESTRICTED';
       case 'profileUpdates':
-        return 'PROFILE UPDATES';
+        return 'PROFILE UPDATE FUNCTIONALITY RESTRICTED';
       default:
-        return 'FUNCTIONALITY';
+        return 'FUNCTIONALITY RESTRICTED';
     }
   };
 
@@ -57,11 +57,24 @@ const FunctionalityGuard = ({
       case 'withdrawals':
         return <CreditCard className="w-5 h-5 text-red-600" />;
       case 'messaging':
-        return <MessageSquareOff className="w-5 h-5 text-amber-600" />;
+        return <MessageSquareOff className="w-5 h-5 text-red-600" />;
       case 'profileUpdates':
-        return <UserX className="w-5 h-5 text-purple-600" />;
+        return <UserX className="w-5 h-5 text-red-600" />;
       default:
-        return <Lock className="w-5 h-5 text-gray-600" />;
+        return <Lock className="w-5 h-5 text-red-600" />;
+    }
+  };
+
+  const getFunctionalityDescription = () => {
+    switch (functionality) {
+      case 'withdrawals':
+        return 'WITHDRAWAL MANAGEMENT HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR SECURITY REASONS.';
+      case 'messaging':
+        return 'MESSAGING SYSTEM HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR MAINTENANCE.';
+      case 'profileUpdates':
+        return 'PROFILE UPDATE FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
+      default:
+        return 'THIS FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
     }
   };
 
@@ -74,58 +87,36 @@ const FunctionalityGuard = ({
   }
 
   const restrictionLevel = getRestrictionLevel();
-  const message = fallbackMessage || getRestrictionMessage();
-
-  const getBannerStyles = () => {
-    switch (restrictionLevel) {
-      case 'full':
-        return 'bg-red-600 bg-opacity-90 border-red-700 border-opacity-60 text-white';
-      case 'partial':
-        return 'bg-amber-600 bg-opacity-90 border-amber-700 border-opacity-60 text-white';
-      default:
-        return 'bg-blue-600 bg-opacity-90 border-blue-700 border-opacity-60 text-white';
-    }
-  };
+  const message = fallbackMessage || getFunctionalityDescription();
 
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={cn(
-        'border rounded-lg p-4 shadow-sm relative overflow-hidden mb-6',
-        getBannerStyles()
-      )}
+      className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 relative overflow-hidden"
     >
-      {/* Full restriction animation */}
-      {restrictionLevel === 'full' && (
-        <motion.div
-          className="absolute inset-0 bg-red-800 opacity-10"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 2, repeat: Infinity }}
-        />
-      )}
-      
       <div className="flex items-start space-x-3 relative z-10">
         <div className="flex items-center space-x-3 flex-shrink-0">
           {getFunctionalityIcon()}
-          <div className="px-2 py-1 text-xs font-bold rounded uppercase tracking-wider bg-white bg-opacity-20 text-white border border-white border-opacity-30">
-            {restrictionLevel.toUpperCase()}
-          </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold uppercase tracking-wider text-white mb-1">
-            {getFunctionalityLabel()} RESTRICTED
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-red-900 mb-1">
+            {getFunctionalityLabel()}
           </h4>
           
-          <p className="text-sm leading-relaxed font-medium text-white opacity-90">
+          <p className="text-sm leading-relaxed font-medium text-red-800 mb-3">
             {message}
           </p>
           
-          <div className="mt-3 text-xs opacity-80 font-medium text-white">
-            <span>System Administrator</span>
-            <span className="ml-2">• Restriction Level: {restrictionLevel.toUpperCase()}</span>
+          <div className="flex items-center space-x-3">
+            <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-red-600 text-white">
+              FULL RESTRICTION
+            </span>
+            <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 text-white">
+              GOVERNOR CONTROL
+            </span>
           </div>
         </div>
       </div>

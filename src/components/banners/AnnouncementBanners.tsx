@@ -52,6 +52,10 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
     }
   };
 
+  const getBannerTitle = (banner: AnnouncementBanner) => {
+    return `${banner.title.toUpperCase()}`;
+  };
+
   if (visibleBanners.length === 0) {
     return null;
   }
@@ -61,7 +65,6 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
       <AnimatePresence>
         {visibleBanners.map((banner, index) => {
           const Icon = getBannerIcon(banner.type);
-          const isUrgent = banner.priority === 'urgent';
           
           return (
             <motion.div
@@ -70,52 +73,41 @@ const AnnouncementBanners: React.FC<AnnouncementBannersProps> = ({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ delay: index * 0.1 }}
-              className={cn(
-                'bg-black border border-gray-800 rounded-lg p-4 mb-6 relative overflow-hidden',
-              )}
+              className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 relative overflow-hidden"
             >
-              {/* Urgent banner animation */}
-              {isUrgent && (
-                <motion.div
-                  className="absolute inset-0 bg-red-800 opacity-10"
-                  animate={{ opacity: [0.1, 0.3, 0.1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              )}
-              
               <div className="flex items-start space-x-3 relative z-10">
                 <div className="flex items-center space-x-3 flex-shrink-0">
-                  <Icon className="w-5 h-5 text-white" />
-                  <div className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-white bg-opacity-20 text-white border border-white border-opacity-30">
-                    {getPriorityIndicator(banner.priority)}
-                  </div>
-                  <div className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 bg-opacity-60 text-white border border-gray-500 border-opacity-40">
-                    ANNOUNCEMENT
-                  </div>
+                  <Icon className="w-5 h-5 text-red-600" />
                 </div>
                 
                 <div className="flex-1 min-w-0">
-                  <h4 className="text-sm font-semibold uppercase tracking-wider text-white mb-1">
-                    {banner.title}
+                  <h4 className="text-sm font-semibold uppercase tracking-wider text-red-900 mb-1">
+                    {getBannerTitle(banner)}
                   </h4>
                   
-                  <p className="text-sm leading-relaxed font-medium text-white opacity-90">
+                  <p className="text-sm leading-relaxed font-medium text-red-800 mb-3">
                     {banner.message}
                   </p>
                   
-                  <div className="mt-2 text-xs text-white opacity-80 font-medium">
-                    <span>System Administrator</span>
-                    {banner.endDate && (
-                      <span className="ml-2">
-                        • Valid until: {banner.endDate.toLocaleDateString()}
-                      </span>
-                    )}
+                  <div className="flex items-center space-x-3">
+                    <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-red-600 text-white">
+                      {getPriorityIndicator(banner.priority)} PRIORITY
+                    </span>
+                    <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 text-white">
+                      SYSTEM ANNOUNCEMENT
+                    </span>
                   </div>
+                  
+                  {banner.endDate && (
+                    <div className="mt-2 text-xs text-red-700 font-medium">
+                      Valid until: {banner.endDate.toLocaleDateString()}
+                    </div>
+                  )}
                 </div>
                 
                 <button
                   onClick={() => handleDismiss(banner.id)}
-                  className="flex-shrink-0 p-1 hover:bg-white hover:bg-opacity-20 rounded-lg transition-colors text-white"
+                  className="flex-shrink-0 p-1 hover:bg-red-100 rounded-lg transition-colors text-red-600"
                 >
                   <X className="w-4 h-4" />
                 </button>

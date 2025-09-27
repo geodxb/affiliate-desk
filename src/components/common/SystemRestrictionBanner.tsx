@@ -39,33 +39,29 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ class
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -20 }}
         className={cn(
-          'bg-black border border-gray-800 rounded-lg p-4 mb-6 relative overflow-hidden',
+          'bg-red-50 border border-red-200 rounded-lg p-4 mb-6 relative overflow-hidden',
           className
         )}
       >
-        <motion.div
-          className="absolute inset-0 bg-purple-800 opacity-10"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
         <div className="flex items-start space-x-3 relative z-10">
           <div className="flex items-center space-x-3 flex-shrink-0">
-            <Settings className="w-5 h-5 text-white" />
-            <div className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-white bg-opacity-20 text-white border border-white border-opacity-30">
-              MAINTENANCE
-            </div>
+            <Settings className="w-5 h-5 text-red-600" />
           </div>
           
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-1">
+            <h3 className="text-sm font-semibold text-red-900 uppercase tracking-wider mb-1">
               SYSTEM MAINTENANCE
             </h3>
-            <p className="text-sm text-white opacity-90 font-medium">
+            <p className="text-sm text-red-800 font-medium mb-3">
               {getMaintenanceMessage()}
             </p>
-            <div className="mt-2 text-xs text-white opacity-80 font-medium">
-              <span>System Administrator</span>
+            <div className="flex items-center space-x-3">
+              <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-red-600 text-white">
+                MAINTENANCE
+              </span>
+              <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 text-white">
+                GOVERNOR CONTROL
+              </span>
             </div>
           </div>
         </div>
@@ -79,11 +75,11 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ class
   const getRestrictionIcon = () => {
     switch (restrictionLevel) {
       case 'full':
-        return <XCircle className="w-5 h-5 text-white" />;
+        return <XCircle className="w-5 h-5 text-red-600" />;
       case 'partial':
-        return <AlertTriangle className="w-5 h-5 text-white" />;
+        return <AlertTriangle className="w-5 h-5 text-red-600" />;
       default:
-        return <Info className="w-5 h-5 text-white" />;
+        return <Info className="w-5 h-5 text-red-600" />;
     }
   };
 
@@ -97,7 +93,6 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ class
   };
 
   const disabledFunctionalities = getDisabledFunctionalities();
-  const isFullRestriction = restrictionLevel === 'full';
 
   return (
     <motion.div
@@ -105,42 +100,27 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ class
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       className={cn(
-        'bg-black border border-gray-800 rounded-lg p-4 mb-6 relative overflow-hidden',
+        'bg-red-50 border border-red-200 rounded-lg p-4 mb-6 relative overflow-hidden',
         className
       )}
     >
-      {/* Full restriction animation */}
-      {isFullRestriction && (
-        <motion.div
-          className="absolute inset-0 bg-red-800 opacity-10"
-          animate={{ opacity: [0.1, 0.3, 0.1] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
-      )}
-      
       <div className="flex items-start space-x-3 relative z-10">
         <div className="flex items-center space-x-3 flex-shrink-0">
           {getRestrictionIcon()}
-          <div className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-white bg-opacity-20 text-white border border-white border-opacity-30">
-            {restrictionLevel.toUpperCase()}
-          </div>
-          <div className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 bg-opacity-60 text-white border border-gray-500 border-opacity-40">
-            SYSTEM
-          </div>
         </div>
         
         <div className="flex-1 min-w-0">
-          <h4 className="text-sm font-semibold uppercase tracking-wider text-white mb-1">
+          <h4 className="text-sm font-semibold uppercase tracking-wider text-red-900 mb-1">
             PLATFORM ACCESS RESTRICTION
           </h4>
           
-          <p className="text-sm leading-relaxed font-medium text-white opacity-90">
+          <p className="text-sm leading-relaxed font-medium text-red-800 mb-3">
             {restrictionMessage}
           </p>
           
           {/* Show disabled services */}
           {disabledFunctionalities.length > 0 && (
-            <div className="mt-2 text-xs font-medium text-white opacity-80">
+            <div className="mb-3 text-sm font-medium text-red-800">
               <span className="font-semibold">Affected Services: </span>
               <span>{disabledFunctionalities.join(', ')}</span>
             </div>
@@ -148,14 +128,19 @@ const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ class
           
           {/* Show allowed pages for full restriction */}
           {restrictionLevel === 'full' && systemSettings?.systemControls?.allowedPages && systemSettings.systemControls.allowedPages.length > 0 && (
-            <div className="mt-1 text-xs font-medium text-white opacity-80">
+            <div className="mb-3 text-sm font-medium text-red-800">
               <span className="font-semibold">Available Sections: </span>
               <span>{systemSettings.systemControls.allowedPages.join(', ')}</span>
             </div>
           )}
           
-          <div className="mt-2 text-xs text-white opacity-80 font-medium">
-            <span>System Administrator</span>
+          <div className="flex items-center space-x-3">
+            <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-red-600 text-white">
+              {restrictionLevel.toUpperCase()} RESTRICTION
+            </span>
+            <span className="px-3 py-1 text-xs font-bold rounded uppercase tracking-wider bg-gray-600 text-white">
+              GOVERNOR CONTROL
+            </span>
           </div>
         </div>
       </div>
