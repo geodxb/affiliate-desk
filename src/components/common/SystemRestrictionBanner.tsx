@@ -4,7 +4,11 @@ import { useSystemControls } from '../../hooks/useSystemControls';
 import { AlertTriangle, Shield, Lock, MessageSquareOff, CreditCard, UserX, Settings, Info, XCircle } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
-const SystemRestrictionBanner: React.FC = () => {
+interface SystemRestrictionBannerProps {
+  className?: string;
+}
+
+const SystemRestrictionBanner: React.FC<SystemRestrictionBannerProps> = ({ className }) => {
   const { 
     systemSettings,
     isWithdrawalsEnabled, 
@@ -93,7 +97,7 @@ const SystemRestrictionBanner: React.FC = () => {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className={`border rounded-lg p-4 mb-6 relative overflow-hidden ${getRestrictionStyles()} ${className}`}
+      className={cn("border rounded-lg p-4 mb-6 relative overflow-hidden", getRestrictionStyles(), className)}
     >
       {/* Full restriction animation */}
       {isFullRestriction && (
