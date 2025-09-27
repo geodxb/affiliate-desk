@@ -14,8 +14,14 @@ export const authService = {
       const userProfile = await this.getUserProfile(userCredential.user.uid);
       console.log('Retrieved user profile:', userProfile);
       
-      if (!userProfile || userProfile.role !== 'investor') {
-        console.error('Access denied - not an investor:', userProfile?.role);
+      if (!userProfile) {
+        console.error('No user profile found');
+        throw new Error('User profile not found. Please contact support.');
+      }
+      
+      // Allow access if role is 'investor' or undefined/null (for backward compatibility)
+      if (userProfile.role && userProfile.role !== 'investor') {
+        console.error('Access denied - not an investor:', userProfile.role);
         throw new Error('Access denied. This portal is for investors only.');
       }
 

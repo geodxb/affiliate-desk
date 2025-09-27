@@ -23,12 +23,13 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  if (userProfile && userProfile.role && userProfile.role !== 'investor') {
+  // Allow access if user has investor role OR if role is undefined/null (for backward compatibility)
+  if (userProfile && userProfile.role && userProfile.role !== 'investor' && userProfile.role !== null && userProfile.role !== undefined) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center p-8">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h1>
-          <p className="text-gray-600">This portal is for investors only.</p>
+          <p className="text-gray-600">This portal is for investors only. Current role: {userProfile.role || 'undefined'}</p>
         </div>
       </div>
     );
