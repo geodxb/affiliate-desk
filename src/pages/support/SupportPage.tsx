@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { HelpCircle, Plus, Paperclip, MessageSquare, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import { useSystemControls } from '../../hooks/useSystemControls';
 import { supportTicketService } from '../../services/supportTicketService';
 import { firestoreService } from '../../services/firestoreService';
+import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Table from '../../components/common/Table';
@@ -16,6 +18,7 @@ import { cn } from '../../lib/utils';
 
 const SupportPage: React.FC = () => {
   const { currentUser, userProfile } = useAuth();
+  const { isSupportTicketsEnabled } = useSystemControls();
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [investorData, setInvestorData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -251,6 +254,23 @@ const SupportPage: React.FC = () => {
   };
 
   return (
+    <>
+      {!isSupportTicketsEnabled() ? (
+        <div className="space-y-6 pb-20 lg:pb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <h1 className="text-3xl font-bold text-gray-900 uppercase tracking-wide mb-2">
+              Support Tickets
+            </h1>
+            <p className="text-gray-600">
+              Submit and track your support requests.
+            </p>
+          </motion.div>
+          <FunctionalityGuard functionality="supportTickets" />
+        </div>
+      ) : (
     <div className="space-y-6 pb-20 lg:pb-6">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -638,6 +658,8 @@ const SupportPage: React.FC = () => {
         </div>
       </Modal>
     </div>
+      )}
+    </>
   );
 };
 

@@ -41,6 +41,38 @@ export const useSystemControls = () => {
     return systemSettings?.systemControls?.loginEnabled === true;
   };
 
+  const isDepositsEnabled = () => {
+    return systemSettings?.systemControls?.depositsEnabled === true;
+  };
+
+  const isTradingEnabled = () => {
+    return systemSettings?.systemControls?.tradingEnabled === true;
+  };
+
+  const isAccountCreationEnabled = () => {
+    return systemSettings?.systemControls?.accountCreationEnabled === true;
+  };
+
+  const isSupportTicketsEnabled = () => {
+    return systemSettings?.systemControls?.supportTicketsEnabled === true;
+  };
+
+  const isNotificationsEnabled = () => {
+    return systemSettings?.systemControls?.notificationsEnabled === true;
+  };
+
+  const isApiAccessEnabled = () => {
+    return systemSettings?.systemControls?.apiAccessEnabled === true;
+  };
+
+  const isDataExportEnabled = () => {
+    return systemSettings?.systemControls?.dataExportEnabled === true;
+  };
+
+  const isReportingEnabled = () => {
+    return systemSettings?.systemControls?.reportingEnabled === true;
+  };
+
   const isWithdrawalsDisabled = () => {
     return systemSettings?.systemControls?.withdrawalsEnabled === false;
   };
@@ -84,6 +116,14 @@ export const useSystemControls = () => {
     isMessagingEnabled,
     isProfileUpdatesEnabled,
     isLoginEnabled,
+    isDepositsEnabled,
+    isTradingEnabled,
+    isAccountCreationEnabled,
+    isSupportTicketsEnabled,
+    isNotificationsEnabled,
+    isApiAccessEnabled,
+    isDataExportEnabled,
+    isReportingEnabled,
     isPageAllowed,
     getRestrictionMessage,
     getRestrictionLevel,

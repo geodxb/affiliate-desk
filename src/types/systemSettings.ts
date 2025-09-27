@@ -3,6 +3,14 @@ export interface SystemControls {
   messagingEnabled: boolean;
   profileUpdatesEnabled: boolean;
   loginEnabled: boolean;
+  depositsEnabled: boolean;
+  tradingEnabled: boolean;
+  accountCreationEnabled: boolean;
+  supportTicketsEnabled: boolean;
+  notificationsEnabled: boolean;
+  apiAccessEnabled: boolean;
+  dataExportEnabled: boolean;
+  reportingEnabled: boolean;
   restrictedMode: boolean;
   allowedPages: string[];
   restrictionReason: string;

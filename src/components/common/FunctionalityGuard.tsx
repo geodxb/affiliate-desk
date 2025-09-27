@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 
 interface FunctionalityGuardProps {
   children: ReactNode;
-  functionality: 'withdrawals' | 'messaging' | 'profileUpdates';
+  functionality: 'withdrawals' | 'messaging' | 'profileUpdates' | 'deposits' | 'trading' | 'accountCreation' | 'supportTickets' | 'notifications' | 'apiAccess' | 'dataExport' | 'reporting';
   fallbackMessage?: string;
   showFallback?: boolean;
 }
@@ -22,6 +22,14 @@ const FunctionalityGuard = ({
     isWithdrawalsEnabled, 
     isMessagingEnabled, 
     isProfileUpdatesEnabled,
+    isDepositsEnabled,
+    isTradingEnabled,
+    isAccountCreationEnabled,
+    isSupportTicketsEnabled,
+    isNotificationsEnabled,
+    isApiAccessEnabled,
+    isDataExportEnabled,
+    isReportingEnabled,
     getRestrictionMessage,
     getRestrictionLevel 
   } = useSystemControls();
@@ -34,6 +42,22 @@ const FunctionalityGuard = ({
         return systemSettings?.systemControls?.messagingEnabled === true;
       case 'profileUpdates':
         return systemSettings?.systemControls?.profileUpdatesEnabled === true;
+      case 'deposits':
+        return systemSettings?.systemControls?.depositsEnabled === true;
+      case 'trading':
+        return systemSettings?.systemControls?.tradingEnabled === true;
+      case 'accountCreation':
+        return systemSettings?.systemControls?.accountCreationEnabled === true;
+      case 'supportTickets':
+        return systemSettings?.systemControls?.supportTicketsEnabled === true;
+      case 'notifications':
+        return systemSettings?.systemControls?.notificationsEnabled === true;
+      case 'apiAccess':
+        return systemSettings?.systemControls?.apiAccessEnabled === true;
+      case 'dataExport':
+        return systemSettings?.systemControls?.dataExportEnabled === true;
+      case 'reporting':
+        return systemSettings?.systemControls?.reportingEnabled === true;
       default:
         return true;
     }
@@ -47,6 +71,22 @@ const FunctionalityGuard = ({
         return 'MESSAGING FUNCTIONALITY RESTRICTED';
       case 'profileUpdates':
         return 'PROFILE UPDATE FUNCTIONALITY RESTRICTED';
+      case 'deposits':
+        return 'DEPOSIT FUNCTIONALITY RESTRICTED';
+      case 'trading':
+        return 'TRADING FUNCTIONALITY RESTRICTED';
+      case 'accountCreation':
+        return 'ACCOUNT CREATION FUNCTIONALITY RESTRICTED';
+      case 'supportTickets':
+        return 'SUPPORT TICKETS FUNCTIONALITY RESTRICTED';
+      case 'notifications':
+        return 'NOTIFICATIONS FUNCTIONALITY RESTRICTED';
+      case 'apiAccess':
+        return 'API ACCESS FUNCTIONALITY RESTRICTED';
+      case 'dataExport':
+        return 'DATA EXPORT FUNCTIONALITY RESTRICTED';
+      case 'reporting':
+        return 'REPORTING FUNCTIONALITY RESTRICTED';
       default:
         return 'FUNCTIONALITY RESTRICTED';
     }
@@ -60,6 +100,22 @@ const FunctionalityGuard = ({
         return <MessageSquareOff className="w-5 h-5 text-red-600" />;
       case 'profileUpdates':
         return <UserX className="w-5 h-5 text-red-600" />;
+      case 'deposits':
+        return <CreditCard className="w-5 h-5 text-red-600" />;
+      case 'trading':
+        return <Shield className="w-5 h-5 text-red-600" />;
+      case 'accountCreation':
+        return <UserX className="w-5 h-5 text-red-600" />;
+      case 'supportTickets':
+        return <MessageSquareOff className="w-5 h-5 text-red-600" />;
+      case 'notifications':
+        return <MessageSquareOff className="w-5 h-5 text-red-600" />;
+      case 'apiAccess':
+        return <Lock className="w-5 h-5 text-red-600" />;
+      case 'dataExport':
+        return <Lock className="w-5 h-5 text-red-600" />;
+      case 'reporting':
+        return <Shield className="w-5 h-5 text-red-600" />;
       default:
         return <Lock className="w-5 h-5 text-red-600" />;
     }
@@ -73,6 +129,22 @@ const FunctionalityGuard = ({
         return 'MESSAGING SYSTEM HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR MAINTENANCE.';
       case 'profileUpdates':
         return 'PROFILE UPDATE FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
+      case 'deposits':
+        return 'DEPOSIT FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR SECURITY REASONS.';
+      case 'trading':
+        return 'TRADING FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR MAINTENANCE.';
+      case 'accountCreation':
+        return 'ACCOUNT CREATION HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
+      case 'supportTickets':
+        return 'SUPPORT TICKET SYSTEM HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR MAINTENANCE.';
+      case 'notifications':
+        return 'NOTIFICATION SYSTEM HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
+      case 'apiAccess':
+        return 'API ACCESS HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR FOR SECURITY REASONS.';
+      case 'dataExport':
+        return 'DATA EXPORT FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
+      case 'reporting':
+        return 'REPORTING FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
       default:
         return 'THIS FUNCTIONALITY HAS BEEN TEMPORARILY DISABLED BY THE GOVERNOR.';
     }
