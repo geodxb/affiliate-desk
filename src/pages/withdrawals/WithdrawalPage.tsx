@@ -110,7 +110,7 @@ const WithdrawalPage: React.FC = () => {
       if (withdrawalId) {
         setShowNewWithdrawal(false);
         resetForm();
-        alert('Withdrawal request submitted successfully!');
+        alert('Withdrawal request submitted successfully! Your balance will be updated once the withdrawal is approved.');
       } else {
         alert('Failed to submit withdrawal request. Please try again.');
       }

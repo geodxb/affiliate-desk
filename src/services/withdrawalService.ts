@@ -311,6 +311,87 @@ export const withdrawalService = {
     }
   },
 
+  async processWithdrawalApproval(withdrawalId: string, adminId: string): Promise<boolean> {
+    try {
+      console.log('=== PROCESSING WITHDRAWAL APPROVAL ===');
+      console.log('Withdrawal ID:', withdrawalId);
+      console.log('Admin ID:', adminId);
+
+      // Get the withdrawal request
+      const withdrawalDoc = await getDoc(doc(db, 'withdrawalRequests', withdrawalId));
+      if (!withdrawalDoc.exists()) {
+        console.error('Withdrawal request not found');
+        return false;
+      }
+
+      const withdrawalData = withdrawalDoc.data() as WithdrawalRequest;
+      console.log('Withdrawal data:', withdrawalData);
+
+      // Get the user's current balance
+      const userDoc = await getDoc(doc(db, 'users', withdrawalData.investorId));
+      if (!userDoc.exists()) {
+        console.error('User not found');
+        return false;
+      }
+
+      const userData = userDoc.data();
+      const currentBalance = userData.currentBalance || userData.balance || 0;
+      console.log('Current balance:', currentBalance);
+      console.log('Withdrawal amount:', withdrawalData.amount);
+
+      // Check if user has sufficient balance
+      if (currentBalance < withdrawalData.amount) {
+        console.error('Insufficient balance for withdrawal');
+        return false;
+      }
+
+      // Calculate new balance after withdrawal
+      const newBalance = currentBalance - withdrawalData.amount;
+      console.log('New balance after withdrawal:', newBalance);
+
+      // Update user balance
+      await updateDoc(doc(db, 'users', withdrawalData.investorId), {
+        currentBalance: newBalance,
+        balance: newBalance, // Update both fields for compatibility
+        updatedAt: Timestamp.now(),
+      });
+
+      // Update withdrawal status to approved
+      await updateDoc(doc(db, 'withdrawalRequests', withdrawalId), {
+        status: 'approved',
+        approvalDate: Timestamp.now(),
+        processedBy: adminId,
+        progress: 50,
+        updatedAt: Timestamp.now(),
+      });
+
+      // Create a transaction record for the withdrawal
+      await addDoc(collection(db, 'transactions'), {
+        investorId: withdrawalData.investorId,
+        type: 'withdrawal',
+        amount: withdrawalData.amount,
+        currency: withdrawalData.currency || 'USD',
+        description: `Withdrawal to ${withdrawalData.type === 'bank' ? 'bank account' : 'crypto wallet'}`,
+        status: 'completed',
+        reference: withdrawalId,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+        metadata: {
+          withdrawalId,
+          destinationType: withdrawalData.type,
+          platformFee: withdrawalData.platformFee,
+          netAmount: withdrawalData.netAmount,
+        },
+      });
+
+      console.log('Withdrawal approval processed successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to process withdrawal approval:', error);
+      return false;
+    }
+  },
+
   calculateWithdrawalBreakdown(amount: number) {
     const platformFee = amount * (WITHDRAWAL_CONFIG.PLATFORM_FEE_PERCENTAGE / 100);
     const netAmount = amount - platformFee;
@@ -346,5 +427,67 @@ export const withdrawalService = {
     }
 
     return { valid: true };
+  },
+
+  async updateWithdrawalStatus(
+    withdrawalId: string,
+    status: string,
+    adminId?: string,
+    notes?: string
+  ): Promise<boolean> {
+    try {
+      console.log('=== UPDATING WITHDRAWAL STATUS ===');
+      console.log('Withdrawal ID:', withdrawalId);
+      console.log('New Status:', status);
+      console.log('Admin ID:', adminId);
+
+      const updateData: any = {
+        status,
+        updatedAt: Timestamp.now(),
+      };
+
+      if (notes) {
+        updateData.notes = notes;
+      }
+
+      if (adminId) {
+        updateData.processedBy = adminId;
+      }
+
+      // Set progress based on status
+      switch (status.toLowerCase()) {
+        case 'approved':
+          updateData.progress = 50;
+          updateData.approvalDate = Timestamp.now();
+          break;
+        case 'processing':
+        case 'sent_to_blockchain':
+          updateData.progress = 75;
+          updateData.processedAt = Timestamp.now();
+          break;
+        case 'credited':
+        case 'completed':
+          updateData.progress = 100;
+          break;
+        case 'rejected':
+        case 'cancelled':
+          updateData.progress = 0;
+          break;
+      }
+
+      // If approving withdrawal, deduct from balance
+      if (status.toLowerCase() === 'approved') {
+        return await this.processWithdrawalApproval(withdrawalId, adminId || 'system');
+      }
+
+      // For other status updates, just update the withdrawal record
+      await updateDoc(doc(db, 'withdrawalRequests', withdrawalId), updateData);
+      
+      console.log('Withdrawal status updated successfully');
+      return true;
+    } catch (error) {
+      console.error('Failed to update withdrawal status:', error);
+      return false;
+    }
   },
 };

@@ -79,7 +79,7 @@ const OverviewCard: React.FC<OverviewCardProps> = ({
             <p className="text-sm font-medium text-gray-600 uppercase tracking-wide mb-2">
               {title}
             </p>
-            <p className="text-3xl font-bold text-gray-900">
+            <p className="text-3xl font-bold text-gray-900" title={`Exact value: ${value}`}>
               {formatValue()}
             </p>
             {percentageChange !== null && (
