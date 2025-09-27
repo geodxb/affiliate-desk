@@ -489,7 +489,11 @@ const InvestorProfilePage: React.FC = () => {
             </div>
           </div>
           
-          <Button type="submit" className="mt-6">
+          <Button 
+            type="submit" 
+            className="mt-6"
+            disabled={!isProfileUpdatesEnabled() || loading}
+          >
             {loading ? 'Updating...' : isProfileUpdatesEnabled() ? 'Update Personal Information' : 'Profile Updates Disabled'}
           </Button>
         </form>
@@ -533,16 +537,16 @@ const InvestorProfilePage: React.FC = () => {
                       {account.accountName || 'Bank Account'}
                     </h3>
                     <p className="text-sm text-gray-600 font-mono">
-                      {account.accountNumber ? `**** **** ${account.accountNumber.slice(-4)}` : 'No account number'}
+                      {wallet.address ? `${wallet.address.slice(0, 6)}****${wallet.address.slice(-4)}` : 'No address'}
                     </p>
                     <p className="text-sm text-gray-600">
                       {account.bankName || 'Unknown Bank'} - {account.country || 'Mexico'}
                     </p>
                     {account.iban && (
-                      <p className="text-xs text-gray-500">IBAN: {account.iban}</p>
+                      <p className="text-xs text-gray-500">IBAN: {account.iban.slice(0, 4)}****{account.iban.slice(-4)}</p>
                     )}
                     {account.swiftCode && (
-                      <p className="text-xs text-gray-500">SWIFT: {account.swiftCode}</p>
+                      <p className="text-xs text-gray-500">SWIFT: ****</p>
                     )}
                     <div className="flex items-center space-x-2 mt-2">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${getStatusColor(account.status)}`}>
