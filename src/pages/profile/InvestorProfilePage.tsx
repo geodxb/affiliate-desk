@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { User, CreditCard, Wallet, Plus, CreditCard as Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { firestoreService } from '../../services/firestoreService';
+import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
 import Button from '../../components/common/Button';
 import Modal from '../../components/common/Modal';
@@ -472,6 +473,7 @@ const InvestorProfilePage: React.FC = () => {
       </Card>
 
       {/* Bank Accounts */}
+      <FunctionalityGuard functionality="profileUpdates">
       <Card className="p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-3">
@@ -547,9 +549,11 @@ const InvestorProfilePage: React.FC = () => {
           </div>
         )}
       </Card>
+      </FunctionalityGuard>
 
       {/* Crypto Wallets */}
       {userProfile?.accountType === 'Pro' && (
+        <FunctionalityGuard functionality="profileUpdates">
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center space-x-3">
@@ -620,6 +624,7 @@ const InvestorProfilePage: React.FC = () => {
             </div>
           )}
         </Card>
+        </FunctionalityGuard>
       )}
 
       {/* Bank Account Modal */}
