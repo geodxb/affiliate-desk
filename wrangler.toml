@@ -3,10 +3,14 @@ compatibility_date = "2025-01-08"
 main = "src/index.ts"
 
 [build]
-command = "npm run build"
+command = "npm install && npm run build"
 
 [assets]
 directory = "./dist"
+
+[env.production]
+NODE_VERSION = "18"
+NPM_VERSION = "9"
 
 [vars]
 ENVIRONMENT = "production"
