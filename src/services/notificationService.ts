@@ -79,50 +79,31 @@ export const notificationService = {
   },
 
   subscribeToNotifications(userId: string, callback: (notifications: PushNotification[]) => void): () => void {
-    // Use the available index: userId + createdAt
+    // Use simple query to avoid index issues
     try {
-      const notificationsQuery = query(
+      const simpleQuery = query(
         collection(db, 'notifications'),
-        where('userId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('userId', '==', userId)
       );
 
-      return onSnapshot(notificationsQuery, (snapshot) => {
+      return onSnapshot(simpleQuery, (snapshot) => {
         const notifications = snapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data(),
           createdAt: doc.data().createdAt?.toDate() || new Date(),
           expiresAt: doc.data().expiresAt?.toDate(),
         })) as PushNotification[];
+        
+        // Sort manually to avoid index requirements
+        notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
         callback(notifications);
       }, (error) => {
-        console.error('Error fetching notifications:', error);
-        // Try fallback without orderBy
-        try {
-          const fallbackQuery = query(
-            collection(db, 'notifications'),
-            where('userId', '==', userId)
-          );
-          
-          return onSnapshot(fallbackQuery, (snapshot) => {
-            const notifications = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-              createdAt: doc.data().createdAt?.toDate() || new Date(),
-              expiresAt: doc.data().expiresAt?.toDate(),
-            })) as PushNotification[];
-            
-            // Sort manually
-            notifications.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
-            callback(notifications);
-          });
-        } catch (fallbackError) {
-          console.error('Notifications fallback query failed:', fallbackError);
-          callback([]);
-        }
+        console.error('Notifications subscription error:', error);
+        callback([]);
       });
     } catch (error) {
       console.error('Error setting up notifications subscription:', error);
+      callback([]);
       return () => {};
     }
   }
