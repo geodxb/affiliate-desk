@@ -524,11 +524,10 @@ const InvestorProfilePage: React.FC = () => {
           <div className="text-center py-8 text-gray-500">
             <CreditCard className="w-12 h-12 mx-auto mb-4 text-gray-300" />
             <p>No bank accounts found. Please add a bank account.</p>
-            <p className="text-xs mt-2">Debug: {JSON.stringify(investorData?.bankAccounts)}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {investorData?.bankAccounts?.map((account) => (
+            {(investorData?.bankAccounts || []).map((account) => (
               <div key={account.id} className="p-4 border border-gray-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div>
@@ -539,15 +538,18 @@ const InvestorProfilePage: React.FC = () => {
                       {account.bankName || 'Unknown Bank'} - {account.country || 'Mexico'}
                     </p>
                     <p className="text-sm text-gray-600 font-mono">
-                      Account: {account.accountNumber ? 
-                        `**** **** ****` : 
-                        '****'}
+                      Account: **** **** ****
                     </p>
                     {account.iban && (
-                      <p className="text-xs text-gray-500">IBAN: {account.iban.slice(0, 4)}****{account.iban.slice(-4)}</p>
+                      <p className="text-xs text-gray-500">
+                        IBAN: {account.iban.length > 8 ? `${account.iban.slice(0, 4)}****${account.iban.slice(-4)}` : '****'}
+                      </p>
                     )}
                     {account.swiftCode && (
-                      <p className="text-xs text-gray-500">SWIFT: ****</p>
+                      <p className="text-xs text-gray-500">SWIFT: {account.swiftCode ? '****' : 'N/A'}</p>
+                    )}
+                    {account.routingNumber && (
+                      <p className="text-xs text-gray-500">Routing: ****</p>
                     )}
                     <div className="flex items-center space-x-2 mt-2">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${getStatusColor(account.status)}`}>
@@ -613,14 +615,14 @@ const InvestorProfilePage: React.FC = () => {
             )}
           </div>
 
-          {investorData?.cryptoWallets.length === 0 ? (
+          {(investorData?.cryptoWallets || []).length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               <Wallet className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p>No crypto wallets found. Please add a crypto wallet.</p>
             </div>
           ) : (
             <div className="space-y-4">
-              {investorData?.cryptoWallets?.map((wallet) => (
+              {(investorData?.cryptoWallets || []).map((wallet) => (
                 <div key={wallet.id} className="p-4 border border-gray-200 rounded-lg">
                   <div className="flex items-center justify-between">
                     <div>
@@ -631,7 +633,9 @@ const InvestorProfilePage: React.FC = () => {
                         {wallet.coinType || 'Unknown Coin'} - {wallet.network || 'Unknown Network'}
                       </p>
                       <p className="text-sm text-gray-600 font-mono">
-                        {wallet.address ? `${wallet.address.slice(0, 6)}****${wallet.address.slice(-4)}` : '****'}
+                        Address: {wallet.address && wallet.address.length > 10 ? 
+                          `${wallet.address.slice(0, 6)}****${wallet.address.slice(-4)}` : 
+                          '****'}
                       </p>
                       <div className="flex items-center space-x-2 mt-2">
                         <span className={`text-xs px-2 py-1 rounded-full font-medium capitalize ${getStatusColor(wallet.status)}`}>
@@ -647,15 +651,13 @@ const InvestorProfilePage: React.FC = () => {
                     <div className="flex space-x-2">
                       {isProfileUpdatesEnabled() ? (
                         <>
-                          {wallet.address && wallet.address !== '****' && (
-                            <Button
-                              onClick={() => openEditCrypto(wallet)}
-                              variant="outline"
-                              size="sm"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </Button>
-                          )}
+                          <Button
+                            onClick={() => openEditCrypto(wallet)}
+                            variant="outline"
+                            size="sm"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </Button>
                           <Button
                             onClick={() => handleDeleteCrypto(wallet.id)}
                             variant="danger"
