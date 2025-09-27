@@ -19,7 +19,6 @@ const SupportPage: React.FC = () => {
   const [tickets, setTickets] = useState<SupportTicket[]>([]);
   const [investorData, setInvestorData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showNewTicket, setShowNewTicket] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null);
   const [showTicketDetail, setShowTicketDetail] = useState(false);
@@ -39,7 +38,6 @@ const SupportPage: React.FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      setShowLoadingScreen(true);
       subscribeToTickets();
       loadInvestorData();
     }
@@ -61,12 +59,7 @@ const SupportPage: React.FC = () => {
 
     const unsubscribe = supportTicketService.subscribeToTickets(
       currentUser.uid,
-      async (tickets) => {
-        // Ensure minimum 3 seconds loading time on initial load
-        if (showLoadingScreen) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          setShowLoadingScreen(false);
-        }
+      (tickets) => {
         setTickets(tickets);
         setLoading(false);
       }
@@ -75,10 +68,6 @@ const SupportPage: React.FC = () => {
     return unsubscribe;
   };
 
-  // Show loading screen during initial load
-  if (showLoadingScreen) {
-    return <LoadingScreen />;
-  }
 
   const handleSubmitTicket = async (e: React.FormEvent) => {
     e.preventDefault();

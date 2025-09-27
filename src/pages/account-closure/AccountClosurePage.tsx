@@ -14,13 +14,11 @@ const AccountClosurePage: React.FC = () => {
   const { currentUser } = useAuth();
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [reason, setReason] = useState('');
 
   useEffect(() => {
     if (currentUser) {
-      setShowLoadingScreen(true);
       loadAccountData();
     }
   }, [currentUser]);
@@ -29,25 +27,16 @@ const AccountClosurePage: React.FC = () => {
     if (!currentUser) return;
 
     try {
-      // Ensure minimum 3 seconds loading time
-      const [profile] = await Promise.all([
-        firestoreService.getInvestorProfile(currentUser.uid),
-        new Promise(resolve => setTimeout(resolve, 3000))
-      ]);
+      const profile = await firestoreService.getInvestorProfile(currentUser.uid);
       
       setInvestorData(profile);
     } catch (error) {
       console.error('Failed to load account data:', error);
     } finally {
       setLoading(false);
-      setShowLoadingScreen(false);
     }
   };
 
-  // Show loading screen during initial load
-  if (showLoadingScreen) {
-    return <LoadingScreen />;
-  }
 
   const handleSubmitRequest = async (e: React.FormEvent) => {
     e.preventDefault();

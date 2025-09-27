@@ -22,7 +22,6 @@ const InvestorDashboardPage: React.FC = () => {
 
   useEffect(() => {
     if (currentUser && userProfile) {
-      setShowLoadingScreen(true);
       loadDashboardData();
       subscribeToAnnouncements();
     }
@@ -39,11 +38,9 @@ const InvestorDashboardPage: React.FC = () => {
     if (!currentUser) return;
 
     try {
-      // Ensure minimum 3 seconds loading time
       const [profile, recentTransactions] = await Promise.all([
         firestoreService.getInvestorProfile(currentUser.uid),
         firestoreService.getTransactions(currentUser.uid, 10),
-        new Promise(resolve => setTimeout(resolve, 3000))
       ]);
 
       setInvestorData(profile);
@@ -81,14 +78,8 @@ const InvestorDashboardPage: React.FC = () => {
       return unsubscribe;
     } catch (error) {
       console.error('Failed to subscribe to announcements:', error);
-      return () => {}; // Return empty unsubscribe function
     }
   };
-
-  // Show loading screen during initial load
-  if (showLoadingScreen) {
-    return <LoadingScreen />;
-  }
 
   // Generate mock performance data for demo
   const generatePerformanceData = (): PerformanceData[] => {

@@ -14,7 +14,6 @@ const InvestorProfilePage: React.FC = () => {
   const { currentUser, userProfile, refreshUserProfile } = useAuth();
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [loading, setLoading] = useState(true);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showBankModal, setShowBankModal] = useState(false);
   const [showCryptoModal, setShowCryptoModal] = useState(false);
   const [editingBank, setEditingBank] = useState<BankAccount | null>(null);
@@ -49,7 +48,6 @@ const InvestorProfilePage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (currentUser) {
       loadProfileData();
     }
   }, [currentUser]);
@@ -84,11 +82,7 @@ const InvestorProfilePage: React.FC = () => {
     if (!currentUser) return;
 
     try {
-      // Ensure minimum 3 seconds loading time
-      const [profile] = await Promise.all([
-        firestoreService.getInvestorProfile(currentUser.uid),
-        new Promise(resolve => setTimeout(resolve, 3000))
-      ]);
+      const profile = await firestoreService.getInvestorProfile(currentUser.uid);
       
       setInvestorData(profile);
       
@@ -108,14 +102,8 @@ const InvestorProfilePage: React.FC = () => {
       console.error('Failed to load profile data:', error);
     } finally {
       setLoading(false);
-      setShowLoadingScreen(false);
     }
   };
-
-  // Show loading screen during initial load
-  if (showLoadingScreen) {
-    return <LoadingScreen />;
-  }
 
   const subscribeToProfileData = () => {
     if (!currentUser) return;
@@ -151,13 +139,31 @@ const InvestorProfilePage: React.FC = () => {
     e.preventDefault();
     if (!currentUser) return;
 
+    setLoading(true);
     try {
-      await firestoreService.updateUserProfile(currentUser.uid, personalInfo);
+      // Update user profile with all personal info fields
+      const updateData = {
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
+        phoneNumber: personalInfo.phoneNumber,
+        country: personalInfo.country,
+        location: personalInfo.location,
+        // Also update the name field for backward compatibility
+        name: `${personalInfo.firstName} ${personalInfo.lastName}`.trim(),
+      };
+      
+      await firestoreService.updateUserProfile(currentUser.uid, updateData);
       await refreshUserProfile();
+      
+      // Reload the profile data to ensure UI is updated
+      await loadProfileData();
+      
       alert('Personal information updated successfully!');
     } catch (error) {
       console.error('Failed to update personal info:', error);
       alert('Failed to update personal information. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -165,6 +171,7 @@ const InvestorProfilePage: React.FC = () => {
     e.preventDefault();
     if (!currentUser) return;
 
+    setLoading(true);
     try {
       if (editingBank) {
         await firestoreService.updateBankAccount(currentUser.uid, editingBank.id, bankForm);
@@ -178,11 +185,18 @@ const InvestorProfilePage: React.FC = () => {
       
       resetBankForm();
       setShowBankModal(false);
-      await loadProfileData();
+      
+      // Reload profile data to show updated information
+      setTimeout(async () => {
+        await loadProfileData();
+      }, 500);
+      
       alert(editingBank ? 'Bank account updated successfully!' : 'Bank account added successfully!');
     } catch (error) {
       console.error('Failed to save bank account:', error);
       alert('Failed to save bank account. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -190,6 +204,7 @@ const InvestorProfilePage: React.FC = () => {
     e.preventDefault();
     if (!currentUser || userProfile?.accountType !== 'Pro') return;
 
+    setLoading(true);
     try {
       if (editingCrypto) {
         await firestoreService.updateCryptoWallet(currentUser.uid, editingCrypto.id, cryptoForm);
@@ -203,37 +218,58 @@ const InvestorProfilePage: React.FC = () => {
       
       resetCryptoForm();
       setShowCryptoModal(false);
-      await loadProfileData();
+      
+      // Reload profile data to show updated information
+      setTimeout(async () => {
+        await loadProfileData();
+      }, 500);
+      
       alert(editingCrypto ? 'Crypto wallet updated successfully!' : 'Crypto wallet added successfully!');
     } catch (error) {
       console.error('Failed to save crypto wallet:', error);
       alert('Failed to save crypto wallet. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteBank = async (accountId: string) => {
     if (!currentUser || !confirm('Are you sure you want to delete this bank account?')) return;
 
+    setLoading(true);
     try {
       await firestoreService.deleteBankAccount(currentUser.uid, accountId);
-      await loadProfileData();
+      
+      // Reload profile data to show updated information
+      setTimeout(async () => {
+        await loadProfileData();
+      }, 500);
+      
       alert('Bank account deleted successfully!');
     } catch (error) {
       console.error('Failed to delete bank account:', error);
       alert('Failed to delete bank account. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteCrypto = async (walletId: string) => {
     if (!currentUser || !confirm('Are you sure you want to delete this crypto wallet?')) return;
 
+    setLoading(true);
     try {
       console.log('Deleting crypto wallet with ID:', walletId);
       const success = await firestoreService.deleteCryptoWallet(currentUser.uid, walletId);
       
       if (success) {
         console.log('Wallet deletion successful, reloading data...');
-        await loadProfileData();
+        
+        // Reload profile data to show updated information
+        setTimeout(async () => {
+          await loadProfileData();
+        }, 500);
+        
         alert('Crypto wallet deleted successfully!');
       } else {
         console.error('Wallet deletion failed');
@@ -242,6 +278,8 @@ const InvestorProfilePage: React.FC = () => {
     } catch (error) {
       console.error('Failed to delete crypto wallet:', error);
       alert('Failed to delete crypto wallet. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -429,7 +467,7 @@ const InvestorProfilePage: React.FC = () => {
           </div>
           
           <Button type="submit" className="mt-6">
-            Update Personal Information
+            {loading ? 'Updating...' : 'Update Personal Information'}
           </Button>
         </form>
       </Card>

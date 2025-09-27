@@ -316,10 +316,16 @@ export const firestoreService = {
 
   async updateUserProfile(userId: string, updates: Partial<User>): Promise<boolean> {
     try {
+      console.log('=== UPDATING USER PROFILE ===');
+      console.log('User ID:', userId);
+      console.log('Updates:', updates);
+      
       await updateDoc(doc(db, 'users', userId), {
         ...updates,
         updatedAt: Timestamp.now(),
       });
+      
+      console.log('Profile update successful');
       return true;
     } catch (error) {
       console.error('Failed to update user profile:', error);
@@ -329,8 +335,12 @@ export const firestoreService = {
 
   async addBankAccount(userId: string, bankAccount: Omit<BankAccount, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> {
     try {
+      console.log('=== ADDING BANK ACCOUNT ===');
+      console.log('User ID:', userId);
+      console.log('Bank Account:', bankAccount);
+      
       // Update the bankDetails field in the user document
-      await updateDoc(doc(db, 'users', userId), {
+      const updateData = {
         bankDetails: {
           accountHolderName: bankAccount.accountName,
           accountNumber: bankAccount.accountNumber,
@@ -343,7 +353,11 @@ export const firestoreService = {
         },
         country: bankAccount.country,
         updatedAt: Timestamp.now(),
-      });
+      };
+      
+      console.log('Update data:', updateData);
+      await updateDoc(doc(db, 'users', userId), updateData);
+      console.log('Bank account added successfully');
       return true;
     } catch (error) {
       console.error('Failed to add bank account:', error);
@@ -353,8 +367,13 @@ export const firestoreService = {
 
   async updateBankAccount(userId: string, accountId: string, updates: Partial<BankAccount>): Promise<boolean> {
     try {
+      console.log('=== UPDATING BANK ACCOUNT ===');
+      console.log('User ID:', userId);
+      console.log('Account ID:', accountId);
+      console.log('Updates:', updates);
+      
       // Update the bankDetails field in the user document
-      await updateDoc(doc(db, 'users', userId), {
+      const updateData = {
         'bankDetails.accountHolderName': updates.accountName,
         'bankDetails.accountNumber': updates.accountNumber,
         'bankDetails.bankName': updates.bankName,
@@ -365,7 +384,11 @@ export const firestoreService = {
         'bankDetails.verificationStatus': updates.status,
         country: updates.country,
         updatedAt: Timestamp.now(),
-      });
+      };
+      
+      console.log('Update data:', updateData);
+      await updateDoc(doc(db, 'users', userId), updateData);
+      console.log('Bank account updated successfully');
       return true;
     } catch (error) {
       console.error('Failed to update bank account:', error);
@@ -389,6 +412,10 @@ export const firestoreService = {
 
   async addCryptoWallet(userId: string, wallet: Omit<CryptoWallet, 'id' | 'createdAt' | 'updatedAt'>): Promise<boolean> {
     try {
+      console.log('=== ADDING CRYPTO WALLET ===');
+      console.log('User ID:', userId);
+      console.log('Wallet:', wallet);
+      
       const newWallet = {
         id: generateId(),
         walletAddress: wallet.address,
@@ -401,10 +428,12 @@ export const firestoreService = {
         updatedAt: Timestamp.now(),
       };
 
+      console.log('New wallet object:', newWallet);
       await updateDoc(doc(db, 'users', userId), {
         cryptoWallets: arrayUnion(newWallet),
         updatedAt: Timestamp.now(),
       });
+      console.log('Crypto wallet added successfully');
       return true;
     } catch (error) {
       console.error('Failed to add crypto wallet:', error);

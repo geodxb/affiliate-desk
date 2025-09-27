@@ -21,7 +21,6 @@ const MessagesPage: React.FC = () => {
   const [newMessage, setNewMessage] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showNewConversation, setShowNewConversation] = useState(false);
   const [newConversationTitle, setNewConversationTitle] = useState('');
   const [newConversationRecipientType, setNewConversationRecipientType] = useState('admin');
@@ -40,7 +39,6 @@ const MessagesPage: React.FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      setShowLoadingScreen(true);
       loadConversations();
       loadUsers();
       loadInvestorData();
@@ -69,16 +67,10 @@ const MessagesPage: React.FC = () => {
     
     const unsubscribe = messageService.subscribeToConversations(
       currentUser.uid,
-      async (conversations) => {
+      (conversations) => {
         console.log('=== CONVERSATIONS CALLBACK RECEIVED ===');
         console.log('Received conversations:', conversations);
         console.log('Number of conversations:', conversations.length);
-        
-        // Ensure minimum 3 seconds loading time on initial load
-        if (showLoadingScreen) {
-          await new Promise(resolve => setTimeout(resolve, 3000));
-          setShowLoadingScreen(false);
-        }
         
         setConversations(conversations);
         setLoading(false);
@@ -94,10 +86,6 @@ const MessagesPage: React.FC = () => {
     return unsubscribe;
   };
 
-  // Show loading screen during initial load
-  if (showLoadingScreen) {
-    return <LoadingScreen />;
-  }
 
   const loadUsers = async () => {
     setLoadingUsers(true);

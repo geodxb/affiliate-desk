@@ -21,7 +21,6 @@ const WithdrawalPage: React.FC = () => {
   const [investorData, setInvestorData] = useState<Investor | null>(null);
   const [withdrawals, setWithdrawals] = useState<WithdrawalRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [showNewWithdrawal, setShowNewWithdrawal] = useState(false);
   const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [selectedWithdrawal, setSelectedWithdrawal] = useState<WithdrawalRequest | null>(null);
@@ -36,7 +35,6 @@ const WithdrawalPage: React.FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      setShowLoadingScreen(true);
       loadData();
       subscribeToWithdrawals();
     }
@@ -46,11 +44,7 @@ const WithdrawalPage: React.FC = () => {
     if (!currentUser) return;
 
     try {
-      // Ensure minimum 3 seconds loading time
-      const [profile] = await Promise.all([
-        firestoreService.getInvestorProfile(currentUser.uid),
-        new Promise(resolve => setTimeout(resolve, 3000))
-      ]);
+      const profile = await firestoreService.getInvestorProfile(currentUser.uid);
 
       setInvestorData(profile);
     } catch (error) {
@@ -65,15 +59,9 @@ const WithdrawalPage: React.FC = () => {
     if (!currentUser) return;
 
     const unsubscribe = withdrawalService.subscribeToWithdrawals(
-      currentUser.uid,
       (withdrawalRequests) => {
         setWithdrawals(withdrawalRequests);
       }
-    );
-
-    return unsubscribe;
-  };
-
   const handleSubmitWithdrawal = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser || !investorData) return;
@@ -97,20 +85,16 @@ const WithdrawalPage: React.FC = () => {
       return;
     }
 
-    setShowLoadingScreen(true);
+    setLoading(true);
 
     try {
-      // Ensure minimum 3 seconds loading time
-      const [withdrawalId] = await Promise.all([
-        withdrawalService.createWithdrawalRequest(
-          currentUser.uid,
-          amount,
-          withdrawalForm.type,
-          withdrawalForm.destination,
-          destination
-        ),
-        new Promise(resolve => setTimeout(resolve, 3000))
-      ]);
+      const withdrawalId = await withdrawalService.createWithdrawalRequest(
+        currentUser.uid,
+        amount,
+        withdrawalForm.type,
+        withdrawalForm.destination,
+        destination
+      );
 
       if (withdrawalId) {
         setShowNewWithdrawal(false);
@@ -123,7 +107,7 @@ const WithdrawalPage: React.FC = () => {
       console.error('Failed to submit withdrawal:', error);
       alert('Failed to submit withdrawal request. Please try again.');
     } finally {
-      setShowLoadingScreen(false);
+      setLoading(false);
     }
   };
 
