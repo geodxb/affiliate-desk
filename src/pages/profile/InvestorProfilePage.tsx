@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { User, CreditCard, Wallet, Plus, CreditCard as Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useSystemControls } from '../../contexts/AuthContext';
+import { useSystemControls } from '../../hooks/useSystemControls';
 import { firestoreService } from '../../services/firestoreService';
 import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';

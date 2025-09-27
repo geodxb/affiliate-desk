@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Send, Paperclip, MessageCircle, Plus, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { messageService } from '../../services/messageService';
-import { useSystemControls } from '../../contexts/AuthContext';
+import { useSystemControls } from '../../hooks/useSystemControls';
 import { firestoreService } from '../../services/firestoreService';
 import FunctionalityGuard from '../../components/common/FunctionalityGuard';
 import Card from '../../components/common/Card';
