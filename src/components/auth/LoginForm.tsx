@@ -53,8 +53,6 @@ const LoginForm: React.FC = () => {
       setTimeout(() => {
         navigate('/dashboard');
       }, 5000);
-      // Navigate to dashboard after successful login
-      navigate('/dashboard');
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Login failed. Please check your credentials.');
