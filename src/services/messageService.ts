@@ -781,82 +781,105 @@ export const messageService = {
   },
 
   subscribeToConversationsEnhanced(userId: string, callback: (conversations: Conversation[]) => void): () => void {
-    // Enhanced subscription using participantUids array
+    // Enhanced subscription using participantUids or participants array
     console.log('=== USING ENHANCED CONVERSATION SUBSCRIPTION ===');
+    console.log('User ID:', userId);
+
     try {
-      console.log('Trying enhanced query with createdBy filter');
-      const enhancedQuery = query(
+      // Try participantUids first (enhanced mode)
+      console.log('Trying query with participantUids filter');
+      const participantUidsQuery = query(
         collection(db, 'conversations'),
-        where('createdBy', '==', userId),
-        orderBy('updatedAt', 'desc')
+        where('participantUids', 'array-contains', userId)
       );
 
-      return onSnapshot(enhancedQuery, (snapshot) => {
-        console.log('Enhanced query (createdBy) snapshot received:', snapshot.docs.length, 'conversations');
-        
-        // Additional client-side filtering for extra security
-        const filteredDocs = snapshot.docs.filter(doc => {
+      return onSnapshot(participantUidsQuery, (snapshot) => {
+        console.log('participantUids query snapshot received:', snapshot.docs.length, 'conversations');
+
+        const conversations = snapshot.docs.map(doc => {
           const data = doc.data();
-          const isCreatedByInvestor = data.createdBy === userId;
-          console.log(`Enhanced filtering conversation ${doc.id}:`, {
+          console.log(`Processing conversation ${doc.id}:`, {
+            title: data.title,
             createdBy: data.createdBy,
-            currentUserId: userId,
-            isCreatedByInvestor,
-            title: data.title
+            participantUids: data.participantUids,
+            participants: data.participants
           });
-          return isCreatedByInvestor;
+
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate() || new Date(),
+            updatedAt: data.updatedAt?.toDate() || new Date(),
+            lastActivity: data.lastActivity?.toDate() || data.updatedAt?.toDate() || new Date(),
+            lastMessage: data.lastMessage ?
+              (typeof data.lastMessage === 'string'
+                ? data.lastMessage
+                : {
+                    ...data.lastMessage,
+                    createdAt: data.lastMessage.createdAt?.toDate() || new Date(),
+                  }
+              ) : undefined,
+          };
+        }) as Conversation[];
+
+        // Sort manually by lastActivity or updatedAt (most recent first)
+        conversations.sort((a, b) => {
+          const aTime = (a as any).lastActivity?.getTime() || a.updatedAt.getTime();
+          const bTime = (b as any).lastActivity?.getTime() || b.updatedAt.getTime();
+          return bTime - aTime;
         });
-        
-        const conversations = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data(),
-          createdAt: doc.data().createdAt?.toDate() || new Date(),
-          updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-          lastMessage: doc.data().lastMessage ? {
-            ...doc.data().lastMessage,
-            createdAt: doc.data().lastMessage.createdAt?.toDate() || new Date(),
-          } : undefined,
-        })) as Conversation[];
-        
-        console.log('Enhanced conversations (creator-filtered):', conversations);
+
+        console.log('Processed conversations:', conversations);
         callback(conversations);
       }, (error) => {
-        console.error('Error in conversations subscription:', error);
-        // Try fallback without orderBy
+        console.error('Error with participantUids query:', error);
+        console.error('Error details:', error.message, error.code);
+
+        // Fallback to participants array (legacy mode)
+        console.log('Falling back to participants array query');
         try {
-          console.log('Trying fallback query with createdBy only');
-          const fallbackQuery = query(
+          const participantsQuery = query(
             collection(db, 'conversations'),
-            where('createdBy', '==', userId)
+            where('participants', 'array-contains', userId)
           );
-          
-          return onSnapshot(fallbackQuery, (snapshot) => {
-            console.log('Fallback query (createdBy only) snapshot received:', snapshot.docs.length, 'conversations');
-            
-            // Extra security filter
-            const filteredDocs = snapshot.docs.filter(doc => {
+
+          return onSnapshot(participantsQuery, (snapshot) => {
+            console.log('participants array query snapshot received:', snapshot.docs.length, 'conversations');
+
+            const conversations = snapshot.docs.map(doc => {
               const data = doc.data();
-              return data.createdBy === userId;
-            });
-            
-            const conversations = snapshot.docs.map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-              createdAt: doc.data().createdAt?.toDate() || new Date(),
-              updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-              lastMessage: doc.data().lastMessage ? {
-                ...doc.data().lastMessage,
-                createdAt: doc.data().lastMessage.createdAt?.toDate() || new Date(),
-              } : undefined,
-            })) as Conversation[];
-            
+              console.log(`Processing conversation ${doc.id}:`, {
+                title: data.title,
+                participants: data.participants
+              });
+
+              return {
+                id: doc.id,
+                ...data,
+                createdAt: data.createdAt?.toDate() || new Date(),
+                updatedAt: data.updatedAt?.toDate() || new Date(),
+                lastMessage: data.lastMessage ?
+                  (typeof data.lastMessage === 'string'
+                    ? data.lastMessage
+                    : {
+                        ...data.lastMessage,
+                        createdAt: data.lastMessage.createdAt?.toDate() || new Date(),
+                      }
+                  ) : undefined,
+              };
+            }) as Conversation[];
+
             // Sort manually
             conversations.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-            console.log('Fallback conversations (creator-only):', conversations);
+
+            console.log('Processed conversations (legacy):', conversations);
             callback(conversations);
+          }, (fallbackError) => {
+            console.error('Fallback participants query also failed:', fallbackError);
+            callback([]);
           });
         } catch (fallbackError) {
-          console.error('Enhanced conversations fallback query failed:', fallbackError);
+          console.error('Error setting up fallback subscription:', fallbackError);
           callback([]);
         }
       });
