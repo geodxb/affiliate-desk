@@ -169,7 +169,33 @@ export const messageService = {
       });
 
       console.log('Enhanced conversation created with ID:', docRef.id);
-      
+
+      // Create initial message in affiliateMessages collection
+      const initialMessageContent = description || `New conversation started: ${conversationTitle}`;
+      const initialMessage = {
+        conversationId: docRef.id,
+        senderId: investorId,
+        senderName: investorName,
+        senderRole: 'investor',
+        content: initialMessageContent,
+        timestamp: Timestamp.now(),
+        priority: urgency as 'low' | 'medium' | 'high' | 'urgent',
+        status: 'sent',
+        isEscalation: false,
+        readBy: [],
+        messageType: 'text',
+        ...(department && { department }),
+      };
+
+      await addDoc(collection(db, 'affiliateMessages'), initialMessage);
+      console.log('Initial message created in affiliateMessages collection');
+
+      // Update conversation with the initial message
+      await updateDoc(docRef, {
+        lastMessage: initialMessageContent,
+        lastMessageSender: investorName,
+      });
+
       // Debug: Immediately fetch the created conversation to verify structure
       try {
         const createdDoc = await getDoc(docRef);
@@ -184,7 +210,7 @@ export const messageService = {
       } catch (debugError) {
         console.error('Failed to fetch created conversation for debugging:', debugError);
       }
-      
+
       return docRef.id;
     } catch (error) {
       console.error('Failed to create enhanced conversation:', error);
@@ -240,6 +266,22 @@ export const messageService = {
       });
 
       console.log('Legacy conversation created with ID:', docRef.id);
+
+      // Create initial message in affiliateMessages collection
+      const initialMessageContent = `New conversation started: ${conversation.title}`;
+      const initialMessage = {
+        conversationId: docRef.id,
+        senderId: investorId,
+        senderName: investorName,
+        senderRole: 'investor',
+        content: initialMessageContent,
+        createdAt: Timestamp.now(),
+        attachments: [],
+      };
+
+      await addDoc(collection(db, 'affiliateMessages'), initialMessage);
+      console.log('Initial message created in affiliateMessages collection');
+
       return docRef.id;
     } catch (error) {
       console.error('Failed to create conversation:', error);
