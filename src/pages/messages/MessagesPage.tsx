@@ -526,25 +526,55 @@ const MessagesPage: React.FC = () => {
                     <p>No messages yet. Start the conversation!</p>
                   </div>
                 ) : (
-                  messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={cn(
-                        'flex',
-                        message.senderId === currentUser?.uid ? 'justify-end' : 'justify-start'
-                      )}
-                    >
-                      <div
+                  messages.map((message) => {
+                    const isOwnMessage = message.senderId === currentUser?.uid;
+                    const getRoleBadge = (role: string) => {
+                      if (role === 'governor') {
+                        return { label: 'Management', color: 'bg-purple-100 text-purple-700' };
+                      } else if (role === 'admin') {
+                        return { label: 'Admin', color: 'bg-blue-100 text-blue-700' };
+                      } else {
+                        return { label: 'Investor', color: 'bg-green-100 text-green-700' };
+                      }
+                    };
+                    const roleBadge = getRoleBadge(message.senderRole);
+
+                    return (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
                         className={cn(
-                          'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
-                          message.senderId === currentUser?.uid
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
+                          'flex flex-col',
+                          isOwnMessage ? 'items-end' : 'items-start'
                         )}
                       >
-                        <p className="text-sm">{message.content}</p>
+                        {/* Sender Name and Role Badge */}
+                        <div className={cn(
+                          'flex items-center space-x-2 mb-1 px-1',
+                          isOwnMessage ? 'flex-row-reverse space-x-reverse' : 'flex-row'
+                        )}>
+                          <span className="text-xs font-semibold text-gray-700">
+                            {message.senderName}
+                          </span>
+                          <span className={cn(
+                            'text-xs px-2 py-0.5 rounded-full font-medium',
+                            roleBadge.color
+                          )}>
+                            {roleBadge.label}
+                          </span>
+                        </div>
+
+                        {/* Message Bubble */}
+                        <div
+                          className={cn(
+                            'max-w-xs lg:max-w-md px-4 py-2 rounded-lg',
+                            isOwnMessage
+                              ? 'bg-blue-600 text-white'
+                              : 'bg-gray-100 text-gray-900'
+                          )}
+                        >
+                          <p className="text-sm">{message.content}</p>
                         {message.attachments && message.attachments.length > 0 && (
                           <div className="mt-2 space-y-1">
                             {message.attachments.map((attachment) => (
@@ -600,12 +630,13 @@ const MessagesPage: React.FC = () => {
                             )}
                           </div>
                         )}
-                        <p className="text-xs mt-1 opacity-75">
-                          {formatDate(message.createdAt)}
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))
+                          <p className="text-xs mt-1 opacity-75">
+                            {formatDate(message.createdAt)}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })
                 )}
                 <div ref={messagesEndRef} />
               </div>
