@@ -86,21 +86,20 @@ export const withdrawalService = {
     try {
       console.log('=== FETCHING WITHDRAWALS FOR USER ===');
       console.log('User ID:', userId);
-      
+
       const withdrawalsQuery = query(
         collection(db, 'withdrawalRequests'),
-        where('investorId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('investorId', '==', userId)
       );
 
       const snapshot = await getDocs(withdrawalsQuery);
       console.log('Found', snapshot.docs.length, 'withdrawal documents');
-      
+
       const withdrawals = snapshot.docs.map(doc => {
         const data = doc.data();
         console.log('Processing withdrawal document:', doc.id);
         console.log('Raw data:', data);
-        
+
         return {
           id: doc.id,
           investorId: data.investorId || userId,
@@ -138,11 +137,15 @@ export const withdrawalService = {
           sentToBlockchainBy: data.sentToBlockchainBy || '',
         };
       }) as WithdrawalRequest[];
-      
+
+      // Sort manually by createdAt (most recent first)
+      withdrawals.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
       console.log('Processed withdrawals:', withdrawals);
       return withdrawals;
     } catch (error) {
       console.error('Failed to fetch withdrawal requests:', error);
+      console.error('Error details:', error);
       return [];
     }
   },
@@ -165,20 +168,19 @@ export const withdrawalService = {
   },
 
   subscribeToWithdrawals(userId: string, callback: (withdrawals: WithdrawalRequest[]) => void): () => void {
-    // Use the available index: investorId + createdAt
+    // Simple query without orderBy to avoid index issues
     try {
       console.log('=== SUBSCRIBING TO WITHDRAWALS ===');
       console.log('User ID:', userId);
-      
+
       const withdrawalsQuery = query(
         collection(db, 'withdrawalRequests'),
-        where('investorId', '==', userId),
-        orderBy('createdAt', 'desc')
+        where('investorId', '==', userId)
       );
 
       return onSnapshot(withdrawalsQuery, (snapshot) => {
         console.log('Withdrawal subscription update - found', snapshot.docs.length, 'documents');
-        
+
         const withdrawals = snapshot.docs.map(doc => ({
           id: doc.id,
           investorId: doc.data().investorId || userId,
@@ -215,64 +217,17 @@ export const withdrawalService = {
           sentToBlockchainAt: doc.data().sentToBlockchainAt?.toDate(),
           sentToBlockchainBy: doc.data().sentToBlockchainBy || '',
         })) as WithdrawalRequest[];
-        
+
+        // Sort manually by createdAt (most recent first)
+        withdrawals.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
         console.log('Processed withdrawal data:', withdrawals);
         callback(withdrawals);
       }, (error) => {
         console.error('Error in withdrawals subscription:', error);
-        // Try fallback with date index
-        try {
-          const fallbackQuery = query(
-            collection(db, 'withdrawalRequests'),
-            where('investorId', '==', userId),
-            orderBy('date', 'desc')
-          );
-          
-          return onSnapshot(fallbackQuery, (snapshot) => {
-            console.log('Fallback query - found', snapshot.docs.length, 'documents');
-            const withdrawals = snapshot.docs.map(doc => ({
-              id: doc.id,
-              investorId: doc.data().investorId || userId,
-              investorName: doc.data().investorName || '',
-              investorEmail: doc.data().investorEmail || '',
-              amount: doc.data().amount || 0,
-              currency: doc.data().currency || 'USD',
-              type: doc.data().type || 'bank',
-              destination: doc.data().destination || '',
-              destinationDetails: doc.data().destinationDetails || {},
-              platformFee: doc.data().platformFee || 0,
-              netAmount: doc.data().netAmount || 0,
-              status: doc.data().status || 'pending',
-              progress: doc.data().progress || 0,
-              date: doc.data().date || '',
-              createdAt: doc.data().createdAt?.toDate() || new Date(),
-              updatedAt: doc.data().updatedAt?.toDate() || new Date(),
-              processedAt: doc.data().processedAt?.toDate(),
-              approvalDate: doc.data().approvalDate?.toDate(),
-              processedBy: doc.data().processedBy || '',
-              reason: doc.data().reason || '',
-              notes: doc.data().notes || '',
-              transactionHash: doc.data().transactionHash || '',
-              mt103Generated: doc.data().mt103Generated || false,
-              mt103GeneratedAt: doc.data().mt103GeneratedAt?.toDate(),
-              mt103DocumentUrl: doc.data().mt103DocumentUrl || '',
-              w8benStatus: doc.data().w8benStatus || '',
-              w8benSubmittedAt: doc.data().w8benSubmittedAt?.toDate(),
-              w8benDocumentUrl: doc.data().w8benDocumentUrl || '',
-              requestedBy: doc.data().requestedBy || 'investor',
-              hashGeneratedAt: doc.data().hashGeneratedAt?.toDate(),
-              hashGeneratedBy: doc.data().hashGeneratedBy || '',
-              hashStatus: doc.data().hashStatus || '',
-              sentToBlockchainAt: doc.data().sentToBlockchainAt?.toDate(),
-              sentToBlockchainBy: doc.data().sentToBlockchainBy || '',
-            })) as WithdrawalRequest[];
-            
-            callback(withdrawals);
-          });
-        } catch (fallbackError) {
-          console.error('Fallback withdrawal query failed:', fallbackError);
-          callback([]);
-        }
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
+        callback([]);
       });
     } catch (error) {
       console.error('Error setting up withdrawals subscription:', error);
