@@ -42,7 +42,7 @@ export const firestoreService = {
             country: userData.country || 'Mexico',
             currency: userData.bankDetails.currency || 'USD',
             isPrimary: true,
-            status: userData.bankDetails.verificationStatus || 'approved',
+            status: userData.bankDetails.verificationStatus || 'pending',
             createdAt: userData.createdAt?.toDate() || new Date(),
             updatedAt: userData.updatedAt?.toDate() || new Date(),
           });
@@ -210,7 +210,7 @@ export const firestoreService = {
             country: userData.country || 'Mexico',
             currency: userData.bankDetails.currency || 'USD',
             isPrimary: true,
-            status: userData.bankDetails.verificationStatus || 'approved',
+            status: userData.bankDetails.verificationStatus || 'pending',
             createdAt: userData.createdAt?.toDate() || new Date(),
             updatedAt: userData.updatedAt?.toDate() || new Date(),
           });

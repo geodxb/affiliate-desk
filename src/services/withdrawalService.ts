@@ -321,10 +321,10 @@ export const withdrawalService = {
       });
 
       // Create a transaction record for the withdrawal
-      await addDoc(collection(db, 'transactions'), {
+      const transactionData = {
         investorId: withdrawalData.investorId,
         type: 'withdrawal',
-        amount: withdrawalData.amount,
+        amount: -withdrawalData.amount,
         currency: withdrawalData.currency || 'USD',
         description: `Withdrawal to ${withdrawalData.type === 'bank' ? 'bank account' : 'crypto wallet'}`,
         status: 'completed',
@@ -337,7 +337,10 @@ export const withdrawalService = {
           platformFee: withdrawalData.platformFee,
           netAmount: withdrawalData.netAmount,
         },
-      });
+      };
+
+      console.log('Creating transaction record:', transactionData);
+      await addDoc(collection(db, 'transactions'), transactionData);
 
       console.log('Withdrawal approval processed successfully');
       return true;
