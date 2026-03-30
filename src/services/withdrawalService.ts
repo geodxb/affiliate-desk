@@ -34,6 +34,14 @@ export const withdrawalService = {
       const platformFee = amount * (WITHDRAWAL_CONFIG.PLATFORM_FEE_PERCENTAGE / 100);
       const netAmount = amount - platformFee;
 
+      // Convert undefined values to null for Firestore compatibility
+      const sanitizedDestinationDetails = Object.fromEntries(
+        Object.entries(destinationDetails).map(([key, value]) => [
+          key,
+          value === undefined ? null : value
+        ])
+      );
+
       const withdrawalRequest: Omit<WithdrawalRequest, 'id'> = {
         investorId: userId,
         investorName: '',
@@ -42,7 +50,7 @@ export const withdrawalService = {
         currency: 'USD',
         type,
         destination: destinationId,
-        destinationDetails,
+        destinationDetails: sanitizedDestinationDetails,
         platformFee,
         netAmount,
         status: 'pending',
