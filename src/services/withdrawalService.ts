@@ -34,14 +34,6 @@ export const withdrawalService = {
       const platformFee = amount * (WITHDRAWAL_CONFIG.PLATFORM_FEE_PERCENTAGE / 100);
       const netAmount = amount - platformFee;
 
-      // Convert undefined values to null for Firestore compatibility
-      const sanitizedDestinationDetails = Object.fromEntries(
-        Object.entries(destinationDetails).map(([key, value]) => [
-          key,
-          value === undefined ? null : value
-        ])
-      );
-
       const withdrawalRequest: Omit<WithdrawalRequest, 'id'> = {
         investorId: userId,
         investorName: '',
@@ -50,7 +42,7 @@ export const withdrawalService = {
         currency: 'USD',
         type,
         destination: destinationId,
-        destinationDetails: sanitizedDestinationDetails,
+        destinationDetails,
         platformFee,
         netAmount,
         status: 'pending',
@@ -329,10 +321,10 @@ export const withdrawalService = {
       });
 
       // Create a transaction record for the withdrawal
-      const transactionData = {
+      await addDoc(collection(db, 'transactions'), {
         investorId: withdrawalData.investorId,
         type: 'withdrawal',
-        amount: -withdrawalData.amount,
+        amount: withdrawalData.amount,
         currency: withdrawalData.currency || 'USD',
         description: `Withdrawal to ${withdrawalData.type === 'bank' ? 'bank account' : 'crypto wallet'}`,
         status: 'completed',
@@ -345,10 +337,7 @@ export const withdrawalService = {
           platformFee: withdrawalData.platformFee,
           netAmount: withdrawalData.netAmount,
         },
-      };
-
-      console.log('Creating transaction record:', transactionData);
-      await addDoc(collection(db, 'transactions'), transactionData);
+      });
 
       console.log('Withdrawal approval processed successfully');
       return true;

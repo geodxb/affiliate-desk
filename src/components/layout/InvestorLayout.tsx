@@ -16,10 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSystemControls } from '../../hooks/useSystemControls';
-import { useDocumentRequests } from '../../hooks/useDocumentRequests';
 import Button from '../common/Button';
 import SystemRestrictionBanner from '../common/SystemRestrictionBanner';
-import DocumentRequestBanner from '../banners/DocumentRequestBanner';
 import { ROUTES } from '../../lib/constants';
 
 interface InvestorLayoutProps {
@@ -30,7 +28,6 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { userProfile, logout } = useAuth();
   const { systemSettings } = useSystemControls();
-  const { documentRequests, dismissDocumentRequest } = useDocumentRequests();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -226,10 +223,6 @@ const InvestorLayout: React.FC<InvestorLayoutProps> = ({ children }) => {
       {/* Main content */}
       <div className="flex-1">
         <main className="p-6">
-          <DocumentRequestBanner
-            requests={documentRequests}
-            onDismiss={dismissDocumentRequest}
-          />
           <SystemRestrictionBanner />
           {children}
         </main>
